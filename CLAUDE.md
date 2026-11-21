@@ -18,7 +18,7 @@ loopback `claude -p` bridge, `services/relay` Firebase RTDB worker for the phone
 - test-changed: `scripts/test_changed.sh`
 - coverage: `pnpm run coverage`
 - coverage-gaps: `coverage-gaps coverage/lcov.info`
-- deploy: `bash scripts/deploy.sh` (from ~/src/mahjong-teacher after `git pull --ff-only`)
+- deploy: `git -C ~/src/mahjong-teacher pull --ff-only && bash ~/src/mahjong-teacher/scripts/deploy.sh` (runs from any directory; the live units must point at ~/src/mahjong-teacher)
 
 ## Rules
 
