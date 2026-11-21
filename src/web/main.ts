@@ -9,8 +9,8 @@ import { actOptions } from '../engine/round.ts'
 import { actionBar, endScreen, roundResult } from './ui.ts'
 import './style.css'
 
-// Boot: URL params pick the mode. `?agent=1` = muted autodrive bot (agent and
-// E2E runs); `?seed=N&len=east|hanchan` skips the menu.
+// Boot: `?agent=1` = muted autodrive bot (agent and E2E runs); `?seed=N` and
+// `?len=east` (short test game) are the only other params. No menu.
 
 const params = new URLSearchParams(location.search)
 const agent = params.get('agent') === '1'
@@ -59,23 +59,8 @@ function startGame(length: MatchLength, seed: number): void {
   audio.startMusic()
 }
 
-// Round pips under each mode glyph: 4 = East only, 8 = East + South.
-const pips = (n: number): string => '<i></i>'.repeat(n)
-
-function menu(): void {
-  document.body.dataset['screen'] = 'menu'
-  $('overlay').innerHTML = `<div class="panel menu">
-    <button class="mode" data-mode="east" data-entity="button:east" data-label="East-only game (tonpuusen)" aria-label="East-only game">東<span class="pips">${pips(4)}</span></button>
-    <button class="mode" data-mode="hanchan" data-entity="button:hanchan" data-label="full game, East and South rounds (hanchan)" aria-label="Full game, East and South">東南<span class="pips">${pips(8)}</span></button></div>`
-}
-
 document.addEventListener('click', (ev) => {
   const t = ev.target as Element
-  const mode = t.closest<HTMLElement>('[data-mode]')?.dataset['mode']
-  if (mode) {
-    startGame(mode === 'east' ? 'east' : 'hanchan', Number(params.get('seed') ?? String(Date.now() % 100000)))
-    return
-  }
   if (!game || document.body.classList.contains('marking')) return
   const act = t.closest<HTMLElement>('[data-act]')?.dataset['act']
   if (act) return onAct(game, act)
@@ -112,9 +97,10 @@ $('t-index').addEventListener('click', () => {
   render()
 })
 
-const len = params.get('len')
-if (len === 'east' || len === 'hanchan') startGame(len, Number(params.get('seed') ?? '1'))
-else menu()
+// No menu: the page opens straight into a full hanchan. `?len=east` is the
+// short test mode; `?seed=N` fixes the deal, otherwise it is random.
+const len = params.get('len') === 'east' ? 'east' : 'hanchan'
+startGame(len, Number(params.get('seed') ?? String(Date.now() % 100000)))
 
 declare global {
   interface Window { __mj: { game: () => Game | null; audioOn: () => boolean } }
