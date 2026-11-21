@@ -2,6 +2,8 @@
 // in with the relay worker's own Firebase session (kuhy's uid), asks one real
 // question through RTDB -> mahjong-relay -> claude -p. Spends plan usage, so it
 // is a manual check: `node scripts/e2e_relay_live.ts`. Exits 1 without an answer.
+// `--propose`: tap ➤ with nothing typed; needs a proposal with its demo drawn
+// (ae243e36 C4). MJ_SITE=http://127.0.0.1:8797/ runs the same on the PC bridge.
 import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -10,6 +12,7 @@ import { chromium } from 'playwright-core'
 const home = homedir()
 const fb = JSON.parse(readFileSync(join(home, '.config/crdt-sync/firebase.json'), 'utf8')) as { apiKey: string; uid: string }
 const sess = JSON.parse(readFileSync(join(home, '.config/mahjong-teacher/firebase_auth.json'), 'utf8')) as { id_token: string; refresh_token: string }
+const propose = process.argv.includes('--propose')
 const site = process.env['MJ_SITE'] ?? 'https://mahjong.kuhy.duckdns.org/'
 const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--mute-audio', '--headless=new'] })
 const page = await browser.newPage({ viewport: { width: 412, height: 915 }, hasTouch: true, isMobile: true })
@@ -44,16 +47,17 @@ try {
   process.stdout.write(`${ts()} status: ${await page.locator('#status').innerHTML()}\n`)
   const tile = page.locator('[data-entity^="tile:"]').first()
   await tile.tap({ force: true })
-  await page.fill('#q', 'Co to za kafel? Jedno zdanie.')
+  if (!propose) await page.fill('#q', 'Co to za kafel? Jedno zdanie.')
   await page.click('#send')
-  for (let i = 0; i < 9; i++) {
-    await page.waitForTimeout(5000)
+  for (let i = 0; i < 16; i++) {
+    await page.waitForTimeout(2000)
     const th = await page.locator('#thread').innerText()
     process.stdout.write(`${ts()} thread: ${th.replace(/\n/g, ' | ').slice(0, 200)}\n`)
     if (!th.includes('…')) break
   }
   await page.screenshot({ path: process.env['MJ_SHOT'] ?? '/tmp/mj-relay-live.png' })
   if ((await page.locator('#thread .turn.assistant:not(.waiting)').count()) === 0) throw new Error('no answer arrived')
+  if (propose && (await page.locator('#thread .turn.assistant.proposal .demo-strip, #thread .turn.assistant.proposal .gloss-chip').count()) === 0) throw new Error('answer has no demo')
   process.stdout.write(`PASS relay live in ${ts()}\n`)
 } finally {
   await browser.close()
