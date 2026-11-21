@@ -80,10 +80,15 @@ export class Audio {
     this.loop = null
   }
 
+  private lastClack = -1
+
+  /** Rate-limited to one per 80 ms so fast AI turns never machine-gun. */
   clack(): void {
     const ctx = this.ensure()
     if (!ctx || !this.master) return
     const at = ctx.currentTime
+    if (at - this.lastClack < 0.08) return
+    this.lastClack = at
     const len = 0.06
     const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * len), ctx.sampleRate)
     const data = buf.getChannelData(0)

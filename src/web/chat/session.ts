@@ -1,13 +1,12 @@
 import type { Explain } from '../../engine/explain.ts'
 import { emptyLog, type ConfusionItem, type Mark, type PlayLog } from '../../log/log.ts'
 import { topicsFor } from '../../log/topics.ts'
+import { isClearPhrase } from '../../log/clear.ts'
 import type { Transport } from './transport.ts'
 
 // One play-through log and the open question thread (a ConfusionItem). A
 // thread closes only when the player says "ok that is clear" (or taps ✓).
 
-const CLEAR = /^\s*(ok(ay)?[,.]?\s*(that'?s|that is|it'?s|it is)\s*clear|ok[,.]?\s*to\s*(jest\s*)?jasne)\s*[.!]*\s*$/i
-export const isClearPhrase = (q: string): boolean => CLEAR.test(q)
 
 const now = (): string => new Date().toISOString()
 
