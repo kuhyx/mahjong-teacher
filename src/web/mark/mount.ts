@@ -1,4 +1,5 @@
 import { explain } from '../../engine/explain.ts'
+import { newMatch, type MatchState } from '../../engine/match.ts'
 import { parseLog, serializeLog } from '../../log/log.ts'
 import { ChatPanel } from '../chat/panel.ts'
 import { pickTransport, usesRelay } from '../chat/pick.ts'
@@ -31,10 +32,16 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
   let pending: string | null = null
   let savedEnd = false
 
+  // Before a game starts (the menu) marking still works: a throw-away session
+  // over an unstarted match, so the player can ask about the menu itself.
+  let menuSession: PlaySession | null = null
   const session = (): PlaySession | null => {
     const g = host.getGame()
-    return g ? (sessions.get(g) ?? null) : null
+    if (g) return sessions.get(g) ?? null
+    menuSession ??= new PlaySession(transport, 0, 'east')
+    return menuSession
   }
+  const matchNow = (): MatchState => host.getGame()?.match ?? newMatch(0, 'east')
 
   function exit(): void {
     layer?.destroy()
@@ -43,13 +50,14 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     layer = panel = bar = null
     document.body.classList.remove('marking')
     host.getGame()?.setPaused(false)
+    menuSession = null
   }
 
   function enter(): void {
     const g = host.getGame()
     const s = session()
-    if (!g || !s || layer) return
-    g.setPaused(true)
+    if (!s || layer) return
+    g?.setPaused(true)
     document.body.classList.add('marking')
     const ml = new MarkLayer(document.body)
     layer = ml
@@ -62,7 +70,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     panel = cp
     ml.onPick = () => cp.chips(ml.picked.map((p) => p.label))
     ml.onText = (x, y) => textInput(ml, x, y)
-    s.setFrame({ entities: [], marks: [], pngBase64: '', jpegBase64: '', snapshot: explain(g.match) })
+    s.setFrame({ entities: [], marks: [], pngBase64: '', jpegBase64: '', snapshot: explain(matchNow()) })
     cp.thread(null, null)
     void relayStatus(cp)
   }
@@ -87,7 +95,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     for (const b of bar.querySelectorAll('button')) b.classList.toggle('on', b.dataset['tool'] === id)
   }
 
-  async function freezeFrame(g: Game, s: PlaySession, ml: MarkLayer): Promise<void> {
+  async function freezeFrame(s: PlaySession, ml: MarkLayer): Promise<void> {
     const stage = document.getElementById('stage')
     if (!stage) return
     ml.canvas.style.visibility = 'hidden'
@@ -97,19 +105,18 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     if (ctx) ml.paint(ctx, scale)
     s.setFrame({
       entities: ml.picked.map((p) => ({ entity: p.entity, label: p.label })), marks: ml.marksAt(scale),
-      pngBase64: canvas.toDataURL('image/png').split(',')[1] ?? '', jpegBase64: toJpegBase64(canvas), snapshot: explain(g.match),
+      pngBase64: canvas.toDataURL('image/png').split(',')[1] ?? '', jpegBase64: toJpegBase64(canvas), snapshot: explain(matchNow()),
     })
   }
 
   async function send(q: string): Promise<void> {
-    const g = host.getGame()
     const s = session()
-    if (!g || !s || !panel || !layer || pending !== null) return
+    if (!s || !panel || !layer || pending !== null) return
     pending = q
     panel.thread(s.item, pending)
     try {
-      if (s.item === null) await freezeFrame(g, s, layer)
-      const r = await s.send(q, explain(g.match))
+      if (s.item === null) await freezeFrame(s, layer)
+      const r = await s.send(q, explain(matchNow()))
       pending = null
       if (r.closed) return exit()
       panel.thread(s.item, null)

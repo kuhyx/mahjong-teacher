@@ -85,3 +85,7 @@ body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
 #status { display: flex; justify-content: flex-end; min-height: 0; }
 #status button { width: 48px; height: 48px; font-size: 22px; }
 #offline { font-size: 26px; color: #e5484d; }
+
+button.mode { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+button.mode .pips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 140px; }
+button.mode .pips i { width: 12px; height: 12px; border-radius: 50%; background: #b8892b; display: block; }

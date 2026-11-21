@@ -59,11 +59,14 @@ function startGame(length: MatchLength, seed: number): void {
   audio.startMusic()
 }
 
+// Round pips under each mode glyph: 4 = East only, 8 = East + South.
+const pips = (n: number): string => '<i></i>'.repeat(n)
+
 function menu(): void {
   document.body.dataset['screen'] = 'menu'
   $('overlay').innerHTML = `<div class="panel menu">
-    <button class="mode" data-mode="east" data-entity="button:east" data-label="East-only game (tonpuusen)" aria-label="East-only game">東</button>
-    <button class="mode" data-mode="hanchan" data-entity="button:hanchan" data-label="full game, East and South rounds (hanchan)" aria-label="Full game, East and South">東南</button></div>`
+    <button class="mode" data-mode="east" data-entity="button:east" data-label="East-only game (tonpuusen)" aria-label="East-only game">東<span class="pips">${pips(4)}</span></button>
+    <button class="mode" data-mode="hanchan" data-entity="button:hanchan" data-label="full game, East and South rounds (hanchan)" aria-label="Full game, East and South">東南<span class="pips">${pips(8)}</span></button></div>`
 }
 
 document.addEventListener('click', (ev) => {
