@@ -14,7 +14,9 @@
     "relay": "node services/relay/main.ts",
     "tutorial-brief": "node scripts/tutorial_brief.ts",
     "e2e": "node scripts/e2e_done_check.ts",
-    "e2e:phone": "node scripts/e2e_phone_mark.ts"
+    "e2e:phone": "node scripts/e2e_phone_mark.ts",
+    "tutorial-coverage": "node scripts/tutorial_coverage.ts",
+    "tutorial-doc": "node scripts/tutorial_doc.ts"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
