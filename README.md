@@ -1,0 +1,3 @@
+# mahjong-teacher
+
+new repo
