@@ -51,6 +51,13 @@ android {
         }
     }
 
+    // lintVital crashes inside webview_flutter_android's generated Kotlin on
+    // the CI JDK 17 toolchain (NoSuchMethodError in JavaDocParser). Our code is
+    // gated by `flutter analyze`, so skip the release-time lint pass.
+    lint {
+        checkReleaseBuilds = false
+    }
+
     buildTypes {
         release {
             signingConfig = signingConfigs.findByName("release")
