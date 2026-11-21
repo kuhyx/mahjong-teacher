@@ -1,15 +1,20 @@
 # mahjong-teacher
 
-new repo
+Browser Riichi mahjong game that teaches by letting the player mark anything on
+the table and ask Claude (on kuhy's plan, via `claude -p`, never an API key).
+Stack: TypeScript + Vite (pnpm), vitest, playwright-core over the system Chromium.
+Skills: build-game, build-web-ui, build-backend.
 
-Created by todoImplementer from todo note `6d3ac82c`. The first session picks the stack from kuhy's skills
-(build-desktop-ui, build-web-ui, build-mobile-app, build-game, build-backend, build-background-service), loads the matching one, and replaces the placeholders below.
+Layout: `src/engine` pure rules (seeded, no `Math.random`), `src/ai` easy AIs and
+the autodrive bot, `src/log` play-through log, `src/web` the page, `services/bridge`
+loopback `claude -p` bridge, `services/relay` Firebase RTDB worker for the phone.
 
 ## Commands
 
-- run: (not chosen yet)
-- test: (not chosen yet)
-- lint: (not chosen yet)
+- run: `./run.sh` (bridge + vite dev on http://127.0.0.1:8791/)
+- test: `~/.claude/scripts/capped.sh pnpm test`
+- lint: `pnpm lint`
+- e2e: `~/.claude/scripts/capped.sh pnpm e2e` (done check, headless Chromium, muted, < 60 s)
 
 ## Rules
 

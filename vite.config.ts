@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 // Relative base so the same build works from Caddy and from a file server.
 export default defineConfig({

@@ -64,7 +64,7 @@ export function tileName(kind: number): string {
 }
 
 export function toCounts(kinds: readonly number[]): number[] {
-  const c = Array.from({ length: KINDS }, () => 0)
+  const c: number[] = new Array<number>(KINDS).fill(0)
   for (const k of kinds) c[k] = (c[k] ?? 0) + 1
   return c
 }

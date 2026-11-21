@@ -47,9 +47,12 @@ function extract(counts: number[], from: number, need: number, acc: Group[], out
  * given how many open melds already sit on the table.
  */
 export function decompose(concealed: readonly number[], openMelds: number): Decomposition[] {
-  const counts = toCounts(concealed)
+  if (concealed.length !== (4 - openMelds) * 3 + 2) return []
+  return decomposeCounts(toCounts(concealed), openMelds)
+}
+
+function decomposeCounts(counts: number[], openMelds: number): Decomposition[] {
   const need = 4 - openMelds
-  if (concealed.length !== need * 3 + 2) return []
   const out: Decomposition[] = []
   for (let p = 0; p < KINDS; p++) {
     if ((counts[p] ?? 0) < 2) continue
@@ -80,9 +83,13 @@ export function isComplete(concealed: readonly number[], openMelds: number): boo
 export function waitsOf(concealed: readonly number[], openMelds: number): number[] {
   const counts = toCounts(concealed)
   const waits: number[] = []
+  if (concealed.length !== (4 - openMelds) * 3 + 1) return waits
   for (let k = 0; k < KINDS; k++) {
-    if ((counts[k] ?? 0) >= 4) continue
-    if (isComplete([...concealed, k], openMelds)) waits.push(k)
+    const c = counts[k] ?? 0
+    if (c >= 4) continue
+    counts[k] = c + 1
+    if (decomposeCounts(counts, openMelds).length > 0) waits.push(k)
+    counts[k] = c
   }
   return waits
 }
