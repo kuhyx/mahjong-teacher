@@ -1,0 +1,16 @@
+{
+  "_comment": "Palette lock for every code-drawn face and the table (procedural-game-art step 1). Traditional tile inks: blue-black, red, green on ivory.",
+  "ivory": "#f4ecd8",
+  "ivoryEdge": "#d8ccb0",
+  "back": "#2f6f73",
+  "backEdge": "#1d4a4d",
+  "ink": "#1f2a44",
+  "red": "#b3261e",
+  "green": "#2e7d4f",
+  "blue": "#1f4e9c",
+  "felt": "#1e4d3a",
+  "feltDark": "#163a2c",
+  "gold": "#d9a441",
+  "text": "#f4ecd8",
+  "muted": "#9fb8ab"
+}

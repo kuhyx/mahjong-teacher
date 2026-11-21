@@ -4,8 +4,8 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   base: './',
   build: { outDir: 'dist', sourcemap: false },
-  server: { host: '127.0.0.1', port: 8791, strictPort: true },
-  preview: { host: '127.0.0.1', port: 8791, strictPort: true },
+  server: { host: '127.0.0.1', port: 8798, strictPort: true, proxy: { '/api': 'http://127.0.0.1:8797' } },
+  preview: { host: '127.0.0.1', port: 8798, strictPort: true },
   test: {
     globals: true,
     include: ['tests/**/*.test.ts'],

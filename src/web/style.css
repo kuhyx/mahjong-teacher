@@ -1,0 +1,34 @@
+/* Layout: the square table fills the shorter screen side; tools float in a corner.
+   Colours mirror art/palette.json (felt, ivory, gold, ink). */
+:root { --felt: #1e4d3a; --dark: #163a2c; --ivory: #f4ecd8; --gold: #d9a441; --ink: #1f2a44; --red: #b3261e; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--dark); color: var(--ivory); font-family: system-ui, sans-serif; overflow: hidden; touch-action: manipulation; }
+#stage { position: relative; width: 100vw; height: 100dvh; display: flex; align-items: center; justify-content: center; }
+#table-wrap { width: min(100vw, 100dvh); height: min(100vw, 100dvh); }
+#table-wrap svg { width: 100%; height: 100%; display: block; }
+g.playable { cursor: pointer; }
+g.playable:hover { transform-box: fill-box; filter: brightness(1.08); }
+g.riichi-ok rect:nth-of-type(2) { stroke: var(--gold); stroke-width: 4; }
+g.hand:not(.playable) { opacity: 0.85; }
+g.last rect:nth-of-type(2) { stroke: var(--gold); stroke-width: 4; }
+g.called { opacity: 0.45; }
+#actions { position: absolute; left: 50%; bottom: calc(min(100vw, 100dvh) * 0.115 + (100dvh - min(100vw, 100dvh)) / 2); transform: translateX(-50%); display: flex; gap: 10px; }
+button { font: inherit; color: var(--ink); background: var(--ivory); border: 2px solid var(--gold); border-radius: 12px; cursor: pointer; }
+button.act { font-size: clamp(16px, 2.4vmin, 28px); font-weight: 700; padding: 0.4em 0.9em; display: flex; align-items: center; gap: 4px; min-height: 44px; }
+svg.mini { height: 1.6em; }
+#tools { position: fixed; top: 8px; right: 8px; display: flex; flex-direction: column; gap: 8px; z-index: 30; }
+#tools button { width: 48px; height: 48px; font-size: 22px; }
+#overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+#overlay .panel { pointer-events: auto; background: rgba(22, 58, 44, 0.96); border: 2px solid var(--gold); border-radius: 18px; padding: 20px 28px; max-width: min(92vw, 760px); max-height: 90dvh; overflow: auto; text-align: center; }
+.panel .big { font-size: 34px; font-weight: 700; margin-bottom: 8px; }
+.panel .hand svg.mini { height: 54px; }
+.panel ul { list-style: none; padding: 0; margin: 8px 0; text-align: left; }
+.panel ul.yaku li { display: flex; justify-content: space-between; gap: 24px; padding: 2px 0; }
+.panel .hanfu { font-size: 22px; color: var(--gold); margin: 6px 0; }
+.panel .seats { display: flex; gap: 18px; justify-content: center; font-size: 20px; margin: 8px 0; }
+.panel .places { display: grid; gap: 6px; font-size: 26px; }
+.panel .place { display: flex; gap: 18px; justify-content: center; }
+.panel .place.p1 { color: var(--gold); }
+.panel ul.history { font-size: 15px; max-height: 40dvh; overflow: auto; }
+.menu { display: flex; gap: 24px; }
+button.mode { font-size: 64px; padding: 16px 32px; font-family: 'Noto Serif CJK JP', 'WenQuanYi Zen Hei', serif; }

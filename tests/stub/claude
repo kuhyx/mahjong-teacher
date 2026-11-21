@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+// Stub `claude -p` for tests and the E2E done check. Mirrors the real CLI's
+// `--output-format json` result shape. Records each call to $STUB_CLAUDE_LOG.
+import { appendFileSync, readFileSync } from 'node:fs'
+
+const args = process.argv.slice(2)
+const prompt = readFileSync(0, 'utf8')
+const at = args.indexOf('--resume')
+const session = at >= 0 ? args[at + 1] : `stub-${String(prompt.length)}-${String(Date.now() % 100000)}`
+if (process.env.STUB_CLAUDE_LOG) {
+  appendFileSync(process.env.STUB_CLAUDE_LOG, `${JSON.stringify({ args, hasKey: 'ANTHROPIC_API_KEY' in process.env, prompt })}\n`)
+}
+const q = (prompt.split('Question:').pop() ?? '').trim()
+const polish = /[ąćęłńóśźż]|\b(dlaczego|czemu|jak|co|czy)\b/i.test(q)
+const waits = /WRONGWAIT/.test(q) ? ['9z'] : null
+const body = polish
+  ? 'To jest kafelek z Twojej ręki. Shanten (odległość od gotowości) mówi, ile wymian brakuje.'
+  : 'That tile is in your hand. Shanten (how many tiles away from ready) tells you how close you are.'
+const facts = waits ? `\n\n\`\`\`facts\n${JSON.stringify({ waits })}\n\`\`\`` : ''
+process.stdout.write(JSON.stringify({ type: 'result', subtype: 'success', is_error: false, result: body + facts, session_id: session }))

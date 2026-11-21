@@ -11,7 +11,7 @@ loopback `claude -p` bridge, `services/relay` Firebase RTDB worker for the phone
 
 ## Commands
 
-- run: `./run.sh` (bridge + vite dev on http://127.0.0.1:8791/)
+- run: `./run.sh` (bridge + site on http://127.0.0.1:8797/)
 - test: `~/.claude/scripts/capped.sh pnpm test`
 - lint: `pnpm lint`
 - e2e: `~/.claude/scripts/capped.sh pnpm e2e` (done check, headless Chromium, muted, < 60 s)
