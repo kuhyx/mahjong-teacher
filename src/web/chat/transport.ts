@@ -18,7 +18,7 @@ export interface AskRequest {
   jpegBase64: string | null
   /** 'propose': answer at once with a meaning, a demo and what to teach next. */
   mode: 'ask' | 'propose'
-  /** Two-letter reply language. */
+  /** Two-letter reply language for a tap with nothing typed; '' = the question's own. */
   lang: string
 }
 

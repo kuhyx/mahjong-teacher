@@ -61,7 +61,7 @@ export function buildPrompt(a: AskInput): string {
     `Picked items:\n${picked}`,
     `Marks drawn: ${describeMarks(a.marks)}`,
     `ENGINE STATE (truth, the player is seat 0):\n${JSON.stringify(a.state)}`,
-    `MODE: ${a.mode ?? 'ask'}. Reply language: ${a.lang ?? 'same as the question'}.`,
+    `MODE: ${a.mode ?? 'ask'}. Reply language: ${a.lang || 'same as the question'}.`,
     `Question: ${a.question}`,
   ].join('\n\n')
 }

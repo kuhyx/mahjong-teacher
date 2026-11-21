@@ -39,14 +39,14 @@ export function validAsk(b: unknown): b is AskBody {
     o.question.length > 0 && o.question.length <= 4000 && typeof o.state === 'object' && o.state !== null &&
     Array.isArray(o.entities) && Array.isArray(o.marks) && (o.sessionId === null || typeof o.sessionId === 'string') &&
     (o.jpegBase64 === null || typeof o.jpegBase64 === 'string') && (o.mode === 'ask' || o.mode === 'propose') &&
-    typeof o.lang === 'string' && /^[a-z]{2}$/.test(o.lang)
+    typeof o.lang === 'string' && /^([a-z]{2})?$/.test(o.lang)
 }
 
 /** Firebase drops empty arrays and nulls; restore them before validating. */
 export function normalizeAsk(b: unknown): unknown {
   if (!b || typeof b !== 'object') return b
   const o = b as Record<string, unknown>
-  return { ...o, entities: o['entities'] ?? [], marks: o['marks'] ?? [], sessionId: o['sessionId'] ?? null, jpegBase64: o['jpegBase64'] ?? null, mode: o['mode'] ?? 'ask', lang: o['lang'] ?? 'en' }
+  return { ...o, entities: o['entities'] ?? [], marks: o['marks'] ?? [], sessionId: o['sessionId'] ?? null, jpegBase64: o['jpegBase64'] ?? null, mode: o['mode'] ?? 'ask', lang: o['lang'] ?? '' }
 }
 
 export async function handleAsk(raw: unknown, c: StoreConfig): Promise<AskResult> {

@@ -1,6 +1,7 @@
 import { newMatch, type MatchState } from '../engine/match.ts'
 import { doraIndicators } from '../engine/round.ts'
 import { doraFromIndicator, tileCode } from '../engine/tiles.ts'
+import { GLOSS } from '../web/strings.ts'
 import type { Demo } from './demo.ts'
 
 // Tutorial scenes: one per thing kuhy marked as unclear in his play-through
@@ -46,9 +47,9 @@ function scenes(m: MatchState): Scene[] {
       covers: [{ entity: HAND_LIKE, label: /of (characters|dots|bamboo)/ }],
       words: /\b(suit|man|pin|sou|characters|dots|bamboo|kolor|kafel\w*)\b/i,
       steps: [
-        { tiles: run('m'), highlight: [2], gloss: { jp: '萬子', romaji: 'Manzu' } },
-        { tiles: run('p'), highlight: [2], gloss: { jp: '筒子', romaji: 'Pinzu' } },
-        { tiles: run('s'), highlight: [2], gloss: { jp: '索子', romaji: 'Souzu' } },
+        { tiles: run('m'), highlight: [2], gloss: { ...GLOSS.manzu } },
+        { tiles: run('p'), highlight: [2], gloss: { ...GLOSS.pinzu } },
+        { tiles: run('s'), highlight: [2], gloss: { ...GLOSS.souzu } },
         { tiles: ['3m', '3p', '3s'], highlight: [0, 1, 2] },
       ],
     },
@@ -58,10 +59,10 @@ function scenes(m: MatchState): Scene[] {
       covers: [{ entity: HAND_LIKE, label: /^(Ton|Nan|Shaa|Pei|Haku|Hatsu|Chun|East|South|West|North|White dragon|Green dragon|Red dragon)\b/ }],
       words: /dragon|smok|yakuhai|honou?r|wind|wiatr|chun|hatsu|haku|\bhan\b/i,
       steps: [
-        { tiles: ['1z', '2z', '3z', '4z'], highlight: [0, 1, 2, 3], gloss: { jp: '風牌', romaji: 'Kazehai' } },
-        { tiles: ['5z', '6z', '7z'], highlight: [0, 1, 2], gloss: { jp: '三元牌', romaji: 'Sangenpai' } },
-        { tiles: ['7z', '7z', '7z'], highlight: [0, 1, 2], gloss: { jp: '役牌', romaji: 'Yakuhai' } },
-        { tiles: ['7z', '7z', '7z'], highlight: [0, 1, 2], pips: 1, gloss: { jp: '飜', romaji: 'Han' } },
+        { tiles: ['1z', '2z', '3z', '4z'], highlight: [0, 1, 2, 3], gloss: { ...GLOSS.kazehai } },
+        { tiles: ['5z', '6z', '7z'], highlight: [0, 1, 2], gloss: { ...GLOSS.sangenpai } },
+        { tiles: ['7z', '7z', '7z'], highlight: [0, 1, 2], gloss: { ...GLOSS.yakuhai } },
+        { tiles: ['7z', '7z', '7z'], highlight: [0, 1, 2], pips: 1, gloss: { ...GLOSS.han } },
         { tiles: ['6z', '6z', '6z', '7z', '7z', '7z'], highlight: [0, 1, 2, 3, 4, 5], pips: 2 },
       ],
     },
@@ -71,8 +72,8 @@ function scenes(m: MatchState): Scene[] {
       covers: [{ entity: /^dora$/ }, { entity: HAND_LIKE, label: /dora/i }],
       words: /\bdor[ay]\b|indicator|wskaźnik/i,
       steps: [
-        { tiles: [tileCode(ind)], highlight: [0], focus: ['dora'], gloss: { jp: 'ドラ表示牌', romaji: 'Dora hyōjihai' } },
-        { tiles: [tileCode(ind), tileCode(doraFromIndicator(ind))], highlight: [1], arrow: [0, 1], focus: ['dora'], gloss: { jp: 'ドラ', romaji: 'Dora' } },
+        { tiles: [tileCode(ind)], highlight: [0], focus: ['dora'], gloss: { ...GLOSS.dorahyojihai } },
+        { tiles: [tileCode(ind), tileCode(doraFromIndicator(ind))], highlight: [1], arrow: [0, 1], focus: ['dora'], gloss: { ...GLOSS.dora } },
         { tiles: ['9m', '1m'], highlight: [1], arrow: [0, 1] },
         { tiles: ['4z', '1z'], highlight: [1], arrow: [0, 1] },
         { tiles: ['7z', '5z'], highlight: [1], arrow: [0, 1] },
@@ -85,11 +86,11 @@ function scenes(m: MatchState): Scene[] {
       covers: [{ entity: /^score:\d$/ }, { entity: /^round$/ }],
       words: /seat|dealer|score|points?|25 ?000|wiatr|rozdaj\w*|punkt\w*|runda|round/i,
       steps: [
-        { tiles: ['1z'], highlight: [0], focus: ['score:0'], gloss: { jp: '東', romaji: 'Ton' } },
-        { tiles: ['1z', '2z', '3z', '4z'], highlight: [0, 1, 2, 3], arrow: [0, 1], focus: ['score:0', 'score:1', 'score:2', 'score:3'], gloss: { jp: '自風', romaji: 'Jikaze' } },
-        { tiles: ['1z'], highlight: [0], focus: ['score:0'], gloss: { jp: '親', romaji: 'Oya' } },
-        { tiles: [], focus: ['score:0', 'score:1', 'score:2', 'score:3'], gloss: { jp: '点棒', romaji: 'Tenbou' } },
-        { tiles: ['1z'], highlight: [0], focus: ['round'], gloss: { jp: '東一局', romaji: 'Ton ikkyoku' } },
+        { tiles: ['1z'], highlight: [0], focus: ['score:0'], gloss: { ...GLOSS.ton } },
+        { tiles: ['1z', '2z', '3z', '4z'], highlight: [0, 1, 2, 3], arrow: [0, 1], focus: ['score:0', 'score:1', 'score:2', 'score:3'], gloss: { ...GLOSS.jikaze } },
+        { tiles: ['1z'], highlight: [0], focus: ['score:0'], gloss: { ...GLOSS.oya } },
+        { tiles: [], focus: ['score:0', 'score:1', 'score:2', 'score:3'], gloss: { ...GLOSS.tenbou } },
+        { tiles: ['1z'], highlight: [0], focus: ['round'], gloss: { ...GLOSS.tonikkyoku } },
       ],
     },
     {
@@ -98,8 +99,8 @@ function scenes(m: MatchState): Scene[] {
       covers: [{ entity: /^button:(east|hanchan)$/ }],
       words: /tonpuu|hanchan|east.only|east and south|długość|przycisk/i,
       steps: [
-        { tiles: ['1z'], highlight: [0], focus: ['round'], gloss: { jp: '東風戦', romaji: 'Tonpuusen' } },
-        { tiles: ['1z', '2z'], highlight: [0, 1], arrow: [0, 1], focus: ['round'], gloss: { jp: '半荘', romaji: 'Hanchan' } },
+        { tiles: ['1z'], highlight: [0], focus: ['round'], gloss: { ...GLOSS.tonpuusen } },
+        { tiles: ['1z', '2z'], highlight: [0, 1], arrow: [0, 1], focus: ['round'], gloss: { ...GLOSS.hanchan } },
       ],
     },
   ]

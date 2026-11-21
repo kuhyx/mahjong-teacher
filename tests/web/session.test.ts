@@ -52,7 +52,7 @@ describe('instant proposal session (ae243e36)', () => {
     await s.send('why?', explain(newMatch(1, 'east')))
     expect(asks[0]?.mode).toBe('ask')
   })
-  it('typed follow-ups in a proposal thread stay in propose mode, in the typed language', async () => {
+  it('typed follow-ups in a proposal thread stay in propose mode; the next tap uses their language', async () => {
     const { t, asks } = fake()
     const s = new PlaySession(t, 1, 'east')
     s.setFrame(frame)
@@ -60,6 +60,33 @@ describe('instant proposal session (ae243e36)', () => {
     await s.propose(state)
     await s.send('pokaż to z rozdającym', state)
     expect(asks[1]?.mode).toBe('propose')
-    expect(asks[1]?.lang).toBe('pl')
+    expect(asks[1]?.lang).toBe('') // typed: answered in its own language
+    await s.reject(state)
+    expect(asks[2]?.lang).toBe('pl')
+  })
+})
+
+describe('reply language (ae243e36)', () => {
+  const state = explain(newMatch(1, 'east'))
+  it('English with "to" stays English; Polish is Polish; typed asks send no language', async () => {
+    const { t, asks } = fake()
+    const s = new PlaySession(t, 1, 'east')
+    s.setFrame(frame)
+    await s.send('What do I need to win?', state)
+    expect(asks[0]?.lang).toBe('')
+    await s.send('ok that is clear', state)
+    s.setFrame(frame)
+    await s.propose(state)
+    expect(asks[1]?.lang).toBe('en')
+    for (const q of ['Ile to jest han?', 'Po co mi te kafle?']) {
+      const f = fake()
+      const p = new PlaySession(f.t, 1, 'east')
+      p.setFrame(frame)
+      await p.send(q, state)
+      await p.send('ok that is clear', state)
+      p.setFrame(frame)
+      await p.propose(state)
+      expect(f.asks[1]?.lang).toBe('pl')
+    }
   })
 })

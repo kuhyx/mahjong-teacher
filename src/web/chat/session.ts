@@ -9,7 +9,7 @@ import type { Transport } from './transport.ts'
 
 
 const now = (): string => new Date().toISOString()
-const POLISH = /[ąćęłńóśźż]|\b(dlaczego|czemu|jak|co|czy|to|nie|jest|pokaż)\b/i
+const POLISH = /[ąćęłńóśźż]|\b(dlaczego|czemu|jak|co|czy|ile|nie|jest|jaki|jaka|pokaz)\b/i
 
 /** Reply language for a tap with no typed text: the last typed question wins. */
 function guessLang(text: string | null): string {
@@ -104,7 +104,9 @@ export class PlaySession {
     const reply = await this.transport.ask({
       logId: this.log.id, itemId: item.id, turn: item.transcript.length, question, state,
       entities: item.entities, marks: item.marks, sessionId: item.sessionId,
-      jpegBase64: first ? (this.frame?.jpegBase64 ?? null) : null, mode, lang: guessLang(this.lastTyped),
+      jpegBase64: first ? (this.frame?.jpegBase64 ?? null) : null, mode,
+      // A typed turn is answered in its own language; only a tap needs a guess.
+      lang: trigger ? guessLang(this.lastTyped) : '',
     })
     item.sessionId = reply.sessionId
     item.flagged = item.flagged || reply.flagged

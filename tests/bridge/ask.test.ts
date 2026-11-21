@@ -80,3 +80,20 @@ describe('bridge ask: propose mode (ae243e36)', () => {
     expect(r.corrected.find((c) => c.field === 'scores')?.engine).toBe(state.scores.join(' '))
   })
 })
+
+describe('bridge ask: facts normalising (C2)', () => {
+  it('accepts E / 東 / "false" / a single score as the engine values', async () => {
+    const { checkFacts } = await import('../../services/bridge/facts.ts')
+    const st = explain(newMatch(1, 'east'))
+    expect(checkFacts({ seatWind: 'E', dealer: true, scores: 25000 }, st)).toEqual([])
+    expect(checkFacts({ seatWind: '東' }, st)).toEqual([])
+    expect(checkFacts({ dealer: 'false' }, st).map((c) => c.field)).toEqual(['dealer'])
+    expect(checkFacts({ seatWind: 'South' }, st).map((c) => c.field)).toEqual(['seatWind'])
+  })
+  it('a typed ask has no forced reply language', async () => {
+    const { dir, log } = setup()
+    await ask({ question: 'What do I need to win?', lang: '', state: explain(newMatch(1, 'east')), entities: [], marks: [], shotPath: null },
+      { claudeBin: STUB, workDir: dir, env: { STUB_CLAUDE_LOG: log } })
+    expect(calls(log)[0]?.prompt).toMatch(/Reply language: same as the question/)
+  })
+})
