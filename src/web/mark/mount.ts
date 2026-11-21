@@ -113,6 +113,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
       pending = null
       if (r.closed) return exit()
       panel.thread(s.item, null)
+      void relayStatus(panel) // an answer means the worker is back: drop a stale offline glyph
     } catch (e) {
       pending = null
       panel.thread(s.item, null)

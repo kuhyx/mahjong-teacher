@@ -1,4 +1,5 @@
 import type { MatchLength } from '../engine/match.ts'
+import { soundIcon } from './icons.ts'
 import { Audio } from './audio.ts'
 import { Game } from './game.ts'
 import { mountMarking } from './mark/mount.ts'
@@ -20,7 +21,7 @@ const audio = new Audio(!agent && localStorage.getItem('mj.sound') === 'on')
 app.innerHTML = `<main id="stage"><div id="table-wrap"></div><div id="actions"></div><div id="hand-wrap"></div><div id="overlay"></div></main>
 <nav id="tools">
   <button id="t-mark" aria-label="Freeze and mark" data-entity="button:mark" data-label="freeze-frame marking button">✎</button>
-  <button id="t-sound" aria-label="Sound on or off" data-entity="button:sound" data-label="sound toggle">${audio.on ? '♪' : '♪̸'}</button>
+  <button id="t-sound" aria-label="Sound on or off" data-entity="button:sound" data-label="sound toggle">${soundIcon(audio.on)}</button>
   <button id="t-index" aria-label="Corner index labels on or off" data-entity="button:index" data-label="tile index label toggle">5p</button>
 </nav>`
 
@@ -98,7 +99,7 @@ window.addEventListener('resize', () => render())
 $('t-sound').addEventListener('click', () => {
   audio.toggle()
   localStorage.setItem('mj.sound', audio.on ? 'on' : 'off')
-  $('t-sound').textContent = audio.on ? '♪' : '♪̸'
+  $('t-sound').innerHTML = soundIcon(audio.on)
 })
 let indexOn = true
 $('t-index').addEventListener('click', () => {

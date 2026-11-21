@@ -1,4 +1,5 @@
 import type { ConfusionItem } from '../../log/log.ts'
+import { offlineIcon } from '../icons.ts'
 import { CLEAR_PHRASE } from '../strings.ts'
 
 // Question drawer: picked-item chips, the thread, an input, send (➤) and ✓
@@ -72,7 +73,7 @@ export class ChatPanel {
     if (!box) return
     box.innerHTML = kind === 'signin'
       ? '<button id="signin" aria-label="Sign in with Google to ask" data-entity="button:signin" data-label="sign-in needed">🔑</button>'
-      : kind === 'offline' ? '<span id="offline" role="img" aria-label="PC worker offline: the question waits in the queue">⏻</span>' : ''
+      : kind === 'offline' ? `<span id="offline" role="img" aria-label="PC worker offline: the question waits in the queue">${offlineIcon()}</span>` : ''
     box.querySelector('#signin')?.addEventListener('click', () => onSignIn?.())
   }
 
