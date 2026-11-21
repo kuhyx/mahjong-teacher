@@ -11,10 +11,22 @@ if (process.env.STUB_CLAUDE_LOG) {
   appendFileSync(process.env.STUB_CLAUDE_LOG, `${JSON.stringify({ args, hasKey: 'ANTHROPIC_API_KEY' in process.env, prompt })}\n`)
 }
 const q = (prompt.split('Question:').pop() ?? '').trim()
-const polish = /[ąćęłńóśźż]|\b(dlaczego|czemu|jak|co|czy)\b/i.test(q)
+const propose = /MODE: propose/.test(prompt)
+const polish = /Reply language: pl/.test(prompt) || /[ąćęłńóśźż]|\b(dlaczego|czemu|jak|co|czy)\b/i.test(q)
 const waits = /WRONGWAIT/.test(q) ? ['9z'] : null
 const body = polish
   ? 'To jest kafelek z Twojej ręki. Shanten (odległość od gotowości) mówi, ile wymian brakuje.'
   : 'That tile is in your hand. Shanten (how many tiles away from ready) tells you how close you are.'
-const facts = waits ? `\n\n\`\`\`facts\n${JSON.stringify({ waits })}\n\`\`\`` : ''
-process.stdout.write(JSON.stringify({ type: 'result', subtype: 'success', is_error: false, result: body + facts, session_id: session }))
+// Propose mode: a demo block (another one after "another way"); a drawn circle
+// makes the stub state a wrong score so the engine correction shows (C2).
+const marks = (prompt.split('Marks drawn:')[1] ?? '').split('\n')[0] ?? ''
+const factObj = { ...(waits ? { waits } : {}), ...(propose && /circle/.test(marks) ? { scores: [24000, 25000, 25000, 25000] } : {}) }
+const facts = Object.keys(factObj).length > 0 ? `\n\n\`\`\`facts\n${JSON.stringify(factObj)}\n\`\`\`` : ''
+const other = /another way/.test(q)
+const demo = propose
+  ? `\n\n\`\`\`demo\n${JSON.stringify(other
+    ? { tiles: ['1m', '2m', '3m'], highlight: [2], arrow: [1, 2], gloss: { jp: '萬子', romaji: 'Manzu' } }
+    : { tiles: ['3m'], highlight: [0], focus: ['score:0'], gloss: { jp: '萬', romaji: 'Man' } })}\n\`\`\``
+  : ''
+const next = propose ? (polish ? '\n\nDalej: dora.' : '\n\nNext: dora.') : ''
+process.stdout.write(JSON.stringify({ type: 'result', subtype: 'success', is_error: false, result: body + demo + next + facts, session_id: session }))

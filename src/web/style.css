@@ -53,6 +53,15 @@ body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
 .turn .fix { margin-top: 6px; color: #ffd27a; }
 .turn.waiting { animation: pulse 1s infinite alternate; }
 @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+#ask button#send.go { background: var(--gold); animation: go 0.8s infinite alternate; }
+@keyframes go { from { box-shadow: 0 0 0 0 var(--gold); } to { box-shadow: 0 0 0 8px rgba(217, 164, 65, 0.25); } }
+.turn.trigger { font-size: 20px; padding: 2px 12px; }
+.demo { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 6px; }
+.demo-strip { max-width: 100%; height: 96px; background: var(--dark); border-radius: 10px; }
+.gloss-chip { display: inline-flex; gap: 8px; align-items: baseline; background: var(--ivory); color: var(--ink); border-radius: 999px; padding: 2px 12px; }
+.gloss { font-family: 'Noto Serif CJK JP', 'WenQuanYi Zen Hei', serif; font-size: 22px; font-weight: 700; }
+.gloss-r { font-size: 15px; font-style: italic; }
+.spot { filter: drop-shadow(0 0 6px var(--gold)) drop-shadow(0 0 3px var(--gold)); animation: pulse 0.9s infinite alternate; }
 #ask { display: flex; gap: 6px; }
 #ask textarea { flex: 1; font: inherit; font-size: 16px; border-radius: 10px; padding: 6px; resize: none; }
 #ask button { width: 48px; font-size: 22px; }

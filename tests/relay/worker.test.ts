@@ -62,4 +62,13 @@ describe('relay worker (C15, C18)', () => {
     await new RelayWorker(db, s, 'pc1').scan()
     expect(readFileSync(join(s.dataDir, 'logs', 'play-p9-y.json'), 'utf8')).toBe(text)
   })
+
+  it('carries propose mode through and returns the demo (ae243e36 C4)', async () => {
+    const db = new FakeRtdb()
+    await db.put(`${ROOT}/requests/rid00000009`, { kind: 'ask', at: 1, body: { ...ask, question: 'show me', mode: 'propose', lang: 'pl' } })
+    await new RelayWorker(db, store(), 'pc1').scan()
+    const r = await db.get<{ ok: boolean; reply: { demo: { tiles: string[] } | null } }>(`${ROOT}/results/rid00000009`)
+    expect(r?.ok).toBe(true)
+    expect(r?.reply.demo?.tiles.length).toBeGreaterThan(0)
+  })
 })

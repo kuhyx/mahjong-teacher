@@ -1,6 +1,7 @@
 import type { Explain } from '../../engine/explain.ts'
 import type { Correction, Mark, PlayLog } from '../../log/log.ts'
 import { serializeLog } from '../../log/log.ts'
+import type { Demo } from '../../tutorial/demo.ts'
 
 // How the page reaches Claude and the log store. On the PC (loopback page) that
 // is the bridge's /api; on the public site it is the Firebase relay (relay.ts).
@@ -15,6 +16,10 @@ export interface AskRequest {
   marks: Mark[]
   sessionId: string | null
   jpegBase64: string | null
+  /** 'propose': answer at once with a meaning, a demo and what to teach next. */
+  mode: 'ask' | 'propose'
+  /** Two-letter reply language. */
+  lang: string
 }
 
 export interface AskReply {
@@ -22,6 +27,7 @@ export interface AskReply {
   sessionId: string | null
   flagged: boolean
   corrected: Correction[]
+  demo: Demo | null
 }
 
 export interface Transport {

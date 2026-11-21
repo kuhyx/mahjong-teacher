@@ -58,3 +58,25 @@ describe('bridge ask', () => {
       .rejects.toThrow(/claude/)
   })
 })
+
+describe('bridge ask: propose mode (ae243e36)', () => {
+  const state = explain(newMatch(1, 'east'))
+  it('propose mode tells the model to answer with no questions back, in the player language, with a demo', async () => {
+    const { dir, log } = setup()
+    const r = await ask({ question: 'show me', mode: 'propose', lang: 'pl', state, entities: [{ entity: 'hand:0:1', label: '3 of characters (man) in your hand' }], marks: [], shotPath: null },
+      { claudeBin: STUB, workDir: dir, env: { STUB_CLAUDE_LOG: log } })
+    const p = calls(log)[0]?.prompt ?? ''
+    expect(p).toMatch(/MODE: propose/)
+    expect(p).toMatch(/Reply language: pl/)
+    expect(r.demo?.tiles.length).toBeGreaterThan(0)
+    expect(r.answer).not.toMatch(/```demo/)
+    expect(r.answer).toMatch(/kafel/)
+  })
+  it('a wrong score in the facts block is struck by the engine (C2)', async () => {
+    const { dir, log } = setup()
+    const r = await ask({ question: 'show me', mode: 'propose', state, entities: [], marks: [{ tool: 'circle', points: [[1, 1], [9, 9]], text: '' }], shotPath: null },
+      { claudeBin: STUB, workDir: dir, env: { STUB_CLAUDE_LOG: log } })
+    expect(r.flagged).toBe(true)
+    expect(r.corrected.find((c) => c.field === 'scores')?.engine).toBe(state.scores.join(' '))
+  })
+})

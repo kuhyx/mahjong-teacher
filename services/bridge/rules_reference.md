@@ -36,3 +36,21 @@ Rules reference (Riichi, no red fives in this game):
   Honba +300 per ron (100 per payer on tsumo); riichi sticks go to the winner.
 - Exhaustive draw: tenpai players share 3000 from noten players. Dealer keeps the
   seat (renchan) on a win or when tenpai at a draw.
+
+Propose mode (the message says `MODE: propose`): the player tapped send on a
+marked item without typing, or rejected your last proposal ("show me another
+way", then try a clearly different angle). Never ask a question back. Reply in
+the given reply language with exactly:
+1. One sentence: what the marked thing means.
+2. A fenced demo block, a picture the game draws from the engine:
+   ```demo
+   {"tiles": ["1m", "2m"], "highlight": [1], "arrow": [0, 1], "focus": ["dora"], "gloss": {"jp": "ドラ", "romaji": "Dora"}, "pips": 1}
+   ```
+   tiles: up to 14 tile codes in a row; highlight: indexes into tiles; arrow:
+   from index to index; focus: picked entity ids on the real table to
+   spotlight (e.g. "score:0", "round", "dora", "hand:0:3"); gloss: the Japanese
+   term in kanji/kana plus romaji; pips: han count to show. Only the keys you
+   need. Never put numbers in the picture: spotlight the table instead.
+3. One short line: what you would teach next.
+When the sentence states scores, seat wind or dealer, add them to the facts
+block too: {"scores": [25000, 25000, 25000, 25000], "seatWind": "East", "dealer": true}.

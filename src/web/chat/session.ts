@@ -1,7 +1,7 @@
 import type { Explain } from '../../engine/explain.ts'
 import { emptyLog, type ConfusionItem, type Mark, type PlayLog } from '../../log/log.ts'
 import { topicsFor } from '../../log/topics.ts'
-import { isClearPhrase } from '../../log/clear.ts'
+import { isClearPhrase, isTriggerPhrase, PROPOSE_PHRASE, REJECT_PHRASE } from '../../log/clear.ts'
 import type { Transport } from './transport.ts'
 
 // One play-through log and the open question thread (a ConfusionItem). A
@@ -9,6 +9,16 @@ import type { Transport } from './transport.ts'
 
 
 const now = (): string => new Date().toISOString()
+const POLISH = /[ąćęłńóśźż]|\b(dlaczego|czemu|jak|co|czy|to|nie|jest|pokaż)\b/i
+
+/** Reply language for a tap with no typed text: the last typed question wins. */
+function guessLang(text: string | null): string {
+  if (text) return POLISH.test(text) ? 'pl' : 'en'
+  const saved = typeof localStorage === 'undefined' ? null : localStorage.getItem('mj.lang')
+  if (saved === 'pl' || saved === 'en') return saved
+  const nav = typeof navigator === 'undefined' ? 'en' : navigator.language.slice(0, 2).toLowerCase()
+  return nav === 'pl' ? 'pl' : 'en'
+}
 
 export interface Frame {
   entities: { entity: string; label: string }[]
@@ -22,6 +32,9 @@ export class PlaySession {
   readonly log: PlayLog
   item: ConfusionItem | null = null
   private frame: Frame | null = null
+  /** Items opened by a tap (➤ empty): follow-ups keep asking for proposals. */
+  private readonly proposing = new Set<string>()
+  private lastTyped: string | null = null
 
   private readonly transport: Transport
 
@@ -55,8 +68,18 @@ export class PlaySession {
     return item
   }
 
-  /** Send a question (or the clear phrase). Returns the assistant turn text, or null when closed. */
-  async send(question: string, state: Explain): Promise<{ closed: boolean }> {
+  /** ➤ with nothing typed: ask at once for a proposal about the marked items. */
+  propose(state: Explain): Promise<{ closed: boolean }> {
+    return this.send(this.item ? REJECT_PHRASE : PROPOSE_PHRASE, state, 'propose')
+  }
+
+  /** ✗: the proposal did not help; ask for a different approach in the same thread. */
+  reject(state: Explain): Promise<{ closed: boolean }> {
+    return this.send(REJECT_PHRASE, state, 'propose')
+  }
+
+  /** Send a question (or the clear phrase). */
+  async send(question: string, state: Explain, force?: 'propose'): Promise<{ closed: boolean }> {
     if (this.item && isClearPhrase(question)) {
       this.item.transcript.push({ role: 'user', text: question, at: now(), corrected: [] })
       this.item.cleared = true
@@ -67,18 +90,25 @@ export class PlaySession {
       return { closed: true }
     }
     const first = this.item === null
-    const item = this.item ?? (this.item = await this.open(question))
+    const trigger = isTriggerPhrase(question)
+    const item = this.item ?? (this.item = await this.open(trigger ? '' : question))
+    if (force === 'propose') this.proposing.add(item.id)
+    const mode = this.proposing.has(item.id) ? 'propose' : 'ask'
+    if (!trigger) {
+      this.lastTyped = question
+      if (typeof localStorage !== 'undefined') localStorage.setItem('mj.lang', guessLang(question))
+    }
     item.transcript.push({ role: 'user', text: question, at: now(), corrected: [] })
-    for (const t of topicsFor([], question)) if (!item.topics.includes(t) && t !== 'flow') item.topics.push(t)
+    if (!trigger) for (const t of topicsFor([], question)) if (!item.topics.includes(t) && t !== 'flow') item.topics.push(t)
     await this.save()
     const reply = await this.transport.ask({
       logId: this.log.id, itemId: item.id, turn: item.transcript.length, question, state,
       entities: item.entities, marks: item.marks, sessionId: item.sessionId,
-      jpegBase64: first ? (this.frame?.jpegBase64 ?? null) : null,
+      jpegBase64: first ? (this.frame?.jpegBase64 ?? null) : null, mode, lang: guessLang(this.lastTyped),
     })
     item.sessionId = reply.sessionId
     item.flagged = item.flagged || reply.flagged
-    item.transcript.push({ role: 'assistant', text: reply.answer, at: now(), corrected: reply.corrected })
+    item.transcript.push({ role: 'assistant', text: reply.answer, at: now(), corrected: reply.corrected, ...(reply.demo ? { demo: reply.demo } : {}) })
     await this.save()
     return { closed: false }
   }

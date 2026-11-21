@@ -1,4 +1,4 @@
-import { isClearPhrase } from './clear.ts'
+import { isClearPhrase, isTriggerPhrase } from './clear.ts'
 import type { ConfusionItem, PlayLog, Topic } from './log.ts'
 
 // Brief for the follow-up tutorial task: every marked item, grouped by topic,
@@ -7,14 +7,16 @@ import type { ConfusionItem, PlayLog, Topic } from './log.ts'
 const ORDER: Topic[] = ['tile', 'yaku', 'scoring', 'flow']
 
 function itemBlock(it: ConfusionItem): string {
-  const questions = it.transcript.filter((t) => t.role === 'user' && !isClearPhrase(t.text)).map((t) => `  - Q: ${t.text}`)
+  const questions = it.transcript.filter((t) => t.role === 'user' && !isClearPhrase(t.text) && !isTriggerPhrase(t.text)).map((t) => `  - Q: ${t.text}`)
   const last = [...it.transcript].reverse().find((t) => t.role === 'assistant')
+  const demo = [...it.transcript].reverse().find((t) => t.role === 'assistant' && t.demo)?.demo
   const fixes = it.transcript.flatMap((t) => t.corrected).map((c) => `  - engine corrected ${c.field}: ${c.model} -> ${c.engine}`)
   return [
     `- **${it.id}** ${it.cleared ? '(cleared)' : '(still open)'}: ${it.entities.map((e) => e.label).join('; ') || 'free mark'}`,
     `  - screenshot: ${it.screenshot}`,
     ...questions,
     `  - final answer: ${last ? last.text.replace(/\n+/g, ' ') : '(none)'}`,
+    ...(demo ? [`  - accepted demo: ${JSON.stringify(demo)}`] : []),
     ...fixes,
   ].join('\n')
 }

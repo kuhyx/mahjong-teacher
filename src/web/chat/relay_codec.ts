@@ -1,4 +1,5 @@
 import type { Correction } from '../../log/log.ts'
+import { parseDemo } from '../../tutorial/demo.ts'
 import type { AskReply } from './transport.ts'
 
 // Firebase RTDB drops empty arrays and nulls, so a reply read back from
@@ -15,5 +16,6 @@ export function askReplyFromRtdb(v: unknown): AskReply {
     sessionId: typeof o.sessionId === 'string' ? o.sessionId : null,
     flagged: o.flagged === true,
     corrected: Array.isArray(o.corrected) ? (o.corrected as Correction[]) : [],
+    demo: parseDemo(o.demo),
   }
 }

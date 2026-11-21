@@ -1,4 +1,5 @@
 import { explain } from '../../engine/explain.ts'
+import { PROPOSE_PHRASE, REJECT_PHRASE } from '../../log/clear.ts'
 import { parseLog, serializeLog } from '../../log/log.ts'
 import { ChatPanel } from '../chat/panel.ts'
 import { pickTransport, usesRelay } from '../chat/pick.ts'
@@ -58,9 +59,13 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     bar.innerHTML = TOOLS.map(([id, glyph, aria]) => `<button data-tool="${id}" aria-label="${aria}"${id === 'pick' ? ' class="on"' : ''}>${glyph}</button>`).join('')
     document.body.appendChild(bar)
     bar.addEventListener('click', (e) => onTool((e.target as Element).closest<HTMLElement>('[data-tool]')?.dataset['tool'] ?? ''))
-    const cp = new ChatPanel(document.body, { send: (q) => void send(q) })
+    const cp = new ChatPanel(document.body, { send: (q) => void send(q), propose: () => void send(null), reject: () => void send('reject') })
     panel = cp
-    ml.onPick = () => cp.chips(ml.picked.map((p) => p.label))
+    ml.onPick = () => {
+      cp.chips(ml.picked.map((p) => p.label))
+      cp.go(true)
+    }
+    ml.onMark = () => cp.go(true)
     ml.onText = (x, y) => textInput(ml, x, y)
     s.setFrame({ entities: [], marks: [], pngBase64: '', jpegBase64: '', snapshot: explain(g.match) })
     cp.thread(null, null)
@@ -101,15 +106,17 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     })
   }
 
-  async function send(q: string): Promise<void> {
+  /** q: typed text; null: ➤ with an empty box (proposal); 'reject': ✗. */
+  async function send(q: string | null): Promise<void> {
     const g = host.getGame()
     const s = session()
     if (!g || !s || !panel || !layer || pending !== null) return
-    pending = q
+    pending = q === null ? (s.item ? REJECT_PHRASE : PROPOSE_PHRASE) : q === 'reject' ? REJECT_PHRASE : q
     panel.thread(s.item, pending)
     try {
       if (s.item === null) await freezeFrame(g, s, layer)
-      const r = await s.send(q, explain(g.match))
+      const state = explain(g.match)
+      const r = q === null ? await s.propose(state) : q === 'reject' ? await s.reject(state) : await s.send(q, state)
       pending = null
       if (r.closed) return exit()
       panel.thread(s.item, null)
@@ -167,6 +174,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
       void sessions.get(g)?.save().catch(() => undefined)
     },
     onRender: (g) => {
+      panel?.respot()
       if (g.screen === 'end' && !savedEnd) {
         savedEnd = true
         void sessions.get(g)?.save().catch(() => undefined)

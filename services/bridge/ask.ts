@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Explain } from '../../src/engine/explain.ts'
 import type { Correction, Mark } from '../../src/log/log.ts'
+import { splitDemo, type Demo } from '../../src/tutorial/demo.ts'
 import { checkFacts, splitFacts } from './facts.ts'
 
 // One question = one `claude -p` run on kuhy's plan (OAuth login of the CLI,
@@ -11,6 +12,9 @@ import { checkFacts, splitFacts } from './facts.ts'
 
 export interface AskInput {
   question: string
+  /** 'propose' = instant proposal: no questions back, meaning + demo + next step. */
+  mode?: 'ask' | 'propose'
+  lang?: string
   state: Explain
   entities: { entity: string; label: string }[]
   marks: Mark[]
@@ -24,6 +28,7 @@ export interface AskResult {
   sessionId: string
   flagged: boolean
   corrected: Correction[]
+  demo: Demo | null
 }
 
 export interface AskConfig {
@@ -56,6 +61,7 @@ export function buildPrompt(a: AskInput): string {
     `Picked items:\n${picked}`,
     `Marks drawn: ${describeMarks(a.marks)}`,
     `ENGINE STATE (truth, the player is seat 0):\n${JSON.stringify(a.state)}`,
+    `MODE: ${a.mode ?? 'ask'}. Reply language: ${a.lang ?? 'same as the question'}.`,
     `Question: ${a.question}`,
   ].join('\n\n')
 }
@@ -98,7 +104,8 @@ export async function ask(a: AskInput, cfg: AskConfig): Promise<AskResult> {
   if (parsed.is_error === true || typeof parsed.result !== 'string' || typeof parsed.session_id !== 'string') {
     throw new Error(`claude returned an error result: ${out.slice(0, 200)}`)
   }
-  const { body, facts } = splitFacts(parsed.result)
+  const { body: withDemo, facts } = splitFacts(parsed.result)
+  const { body, demo } = splitDemo(withDemo)
   const corrected = checkFacts(facts, a.state)
-  return { answer: body, sessionId: parsed.session_id, flagged: corrected.length > 0, corrected }
+  return { answer: body, sessionId: parsed.session_id, flagged: corrected.length > 0, corrected, demo }
 }

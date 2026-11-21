@@ -1,3 +1,5 @@
+import type { Demo } from '../tutorial/demo.ts'
+
 // Play-through log: one `play-<id>.json` per game. Canonical form (sorted keys,
 // 2-space indent, trailing newline) so save -> load -> save is byte-identical.
 // Screenshots live beside it as PNG files; the JSON holds only their names.
@@ -24,6 +26,8 @@ export interface Turn {
   at: string
   /** Facts where the engine overruled the model's answer (C10). */
   corrected: Correction[]
+  /** Proposal picture of an assistant turn (instant-proposal mode). */
+  demo?: Demo
 }
 
 export interface ConfusionItem {

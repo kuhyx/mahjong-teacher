@@ -23,6 +23,8 @@ export class MarkLayer {
   private draft: Mark | null = null
   onPick: (p: Picked) => void = () => undefined
   onText: (x: number, y: number) => void = () => undefined
+  /** A rect, arrow, circle or pen stroke (or a text note) was finished. */
+  onMark: () => void = () => undefined
 
   constructor(parent: HTMLElement) {
     this.canvas = document.createElement('canvas')
@@ -63,9 +65,11 @@ export class MarkLayer {
   }
 
   private up(): void {
-    if (this.draft) this.marks.push(this.draft)
+    const done = this.draft
+    if (done) this.marks.push(done)
     this.draft = null
     this.redraw()
+    if (done) this.onMark()
   }
 
   /** Topmost element under the point that names itself with data-entity. */
@@ -85,6 +89,7 @@ export class MarkLayer {
   addText(x: number, y: number, text: string): void {
     if (text.trim()) this.marks.push({ tool: 'text', points: [[x, y]], text: text.trim() })
     this.redraw()
+    if (text.trim()) this.onMark()
   }
 
   undo(): void {
