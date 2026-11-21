@@ -71,7 +71,16 @@ body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
   #actions { position: static; transform: none; flex-wrap: wrap; justify-content: center; min-height: 48px; }
   #hand-wrap { width: 100vw; }
   #tools { flex-direction: row; }
-  body.marking #stage { height: 56dvh; overflow: hidden; }
+  /* Marking on a phone: the drawer takes the bottom 40%; the table shrinks so
+     the whole hand (about 0.4 x screen width tall) stays above it, and the tool
+     strip is one row where the game buttons were (those hide meanwhile). */
+  body.marking #stage { height: 60dvh; overflow: hidden; padding-top: 50px; }
+  body.marking #table-wrap { width: min(100vw, calc(60dvh - 74px - 40vw)); height: min(100vw, calc(60dvh - 74px - 40vw)); }
+  body.marking #actions { min-height: 0; }
+  body.marking #tools { display: none; }
+  #chat { height: 40dvh; }
+  #mark-tools { flex-wrap: nowrap; right: auto; gap: 4px; }
+  #mark-tools button { width: 40px; height: 40px; font-size: 19px; }
 }
 #status { display: flex; justify-content: flex-end; min-height: 0; }
 #status button { width: 48px; height: 48px; font-size: 22px; }

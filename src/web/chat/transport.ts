@@ -19,7 +19,7 @@ export interface AskRequest {
 
 export interface AskReply {
   answer: string
-  sessionId: string
+  sessionId: string | null
   flagged: boolean
   corrected: Correction[]
 }

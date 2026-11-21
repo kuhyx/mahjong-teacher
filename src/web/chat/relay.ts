@@ -1,7 +1,8 @@
 import type { PlayLog } from '../../log/log.ts'
 import { serializeLog } from '../../log/log.ts'
 import { nativeSignIn, type ShellWindow } from './native_signin.ts'
-import type { AskReply, AskRequest, Transport } from './transport.ts'
+import { askReplyFromRtdb } from './relay_codec.ts'
+import type { AskRequest, Transport } from './transport.ts'
 
 // Public-site transport: the page (phone or PC browser) signs in with Google
 // through Firebase Auth and queues requests in the RTDB node mahjong/v1; the
@@ -93,7 +94,7 @@ async function request(kind: string, body: unknown): Promise<unknown> {
 }
 
 export const relayTransport: Transport = {
-  ask: async (r: AskRequest) => (await request('ask', r)) as AskReply,
+  ask: async (r: AskRequest) => askReplyFromRtdb(await request('ask', r)),
   saveLog: async (log: PlayLog) => {
     await request('log', { id: log.id, text: serializeLog(log) })
   },
