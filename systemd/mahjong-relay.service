@@ -1,0 +1,13 @@
+[Unit]
+Description=Mahjong Teacher Firebase relay worker (phone questions -> claude -p)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/src/mahjong-teacher
+ExecStart=/usr/bin/node %h/src/mahjong-teacher/services/relay/main.ts
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

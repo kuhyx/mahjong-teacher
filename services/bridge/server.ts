@@ -95,7 +95,8 @@ function serveStatic(res: ServerResponse, cfg: BridgeConfig, path: string): void
     const notFound = join(cfg.distDir, '404.html')
     return send(res, 404, existsSync(notFound) ? readFileSync(notFound) : 'not found', 'text/html; charset=utf-8')
   }
-  res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream', 'cache-control': 'no-cache' })
+  const type = file.endsWith('ai-catalog.json') ? 'application/ai-catalog+json' : (TYPES[extname(file)] ?? 'application/octet-stream')
+  res.writeHead(200, { 'content-type': type, 'cache-control': 'no-cache', link: '</.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"' })
   createReadStream(file).pipe(res)
 }
 

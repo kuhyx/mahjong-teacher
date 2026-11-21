@@ -5,9 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="Riichi mahjong you learn by playing: mark anything on the table and ask about it." />
     <title>Mahjong Teacher</title>
+    <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
+    <link rel="alternate" type="text/markdown" href="/index.md" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Mahjong Teacher","url":"https://mahjong.kuhy.duckdns.org/","applicationCategory":"GameApplication","description":"A browser Riichi mahjong game you learn by playing: mark anything on the table and ask about it."}</script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <section id="about">
+        <h1>Mahjong Teacher</h1>
+        <p>A browser Riichi mahjong game you learn by playing. Play a full game against three easy opponents, freeze the table at any moment, mark a tile, meld, discard or score, and ask a question about it in English or Polish. Each question thread is kept until you say "ok that is clear".</p>
+        <p><a href="/index.md">About this game (markdown)</a> · <a href="/llms.txt">llms.txt</a></p>
+      </section>
+    </div>
     <script type="module" src="/src/web/main.ts"></script>
   </body>
 </html>

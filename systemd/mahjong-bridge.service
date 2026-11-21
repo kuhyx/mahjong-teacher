@@ -1,0 +1,14 @@
+[Unit]
+Description=Mahjong Teacher loopback bridge (site + logs + claude -p)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/src/mahjong-teacher
+ExecStart=/usr/bin/node %h/src/mahjong-teacher/services/bridge/main.ts
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target

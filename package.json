@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/agent_artifacts.ts",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit && bash scripts/check_determinism.sh",
     "test": "vitest run",

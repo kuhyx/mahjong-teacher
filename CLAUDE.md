@@ -15,6 +15,9 @@ loopback `claude -p` bridge, `services/relay` Firebase RTDB worker for the phone
 - test: `~/.claude/scripts/capped.sh pnpm test`
 - lint: `pnpm lint`
 - e2e: `~/.claude/scripts/capped.sh pnpm e2e` (done check, headless Chromium, muted, < 60 s)
+- test-changed: `scripts/test_changed.sh`
+- coverage: `pnpm run coverage`
+- coverage-gaps: `coverage-gaps coverage/lcov.info`
 
 ## Rules
 

@@ -11,7 +11,7 @@ const LEASE_MS = 300_000
 const RID = /^[A-Za-z0-9_-]{8,64}$/
 
 export interface RelayRequest {
-  kind: 'ask' | 'log' | 'shot'
+  kind: 'ask' | 'log' | 'shot' | 'ping'
   at: number
   body: unknown
   claim?: { by: string; at: number }
@@ -78,6 +78,7 @@ export class RelayWorker {
 
   private async run(req: RelayRequest): Promise<unknown> {
     const b = req.body as Record<string, unknown> | null
+    if (req.kind === 'ping') return { pong: true, device: this.device }
     if (req.kind === 'ask') {
       if (!validAsk(normalizeAsk(b))) throw new BadRequest('bad ask request')
       this.spawned++
