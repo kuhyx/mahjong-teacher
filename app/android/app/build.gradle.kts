@@ -75,3 +75,11 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+// phone_deploy runs `assembleRelease -x :app:lintVitalRelease`; with release
+// lint off that task is gone and Gradle rejects the exclusion. Keep a no-op.
+afterEvaluate {
+    if (tasks.findByName("lintVitalRelease") == null) {
+        tasks.register("lintVitalRelease")
+    }
+}
