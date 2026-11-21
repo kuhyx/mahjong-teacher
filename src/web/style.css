@@ -61,7 +61,8 @@ body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
 .gloss-chip { display: inline-flex; gap: 8px; align-items: baseline; background: var(--ivory); color: var(--ink); border-radius: 999px; padding: 2px 12px; }
 .gloss { font-family: 'Noto Serif CJK JP', 'WenQuanYi Zen Hei', serif; font-size: 22px; font-weight: 700; }
 .gloss-r { font-size: 15px; font-style: italic; }
-.spot { filter: drop-shadow(0 0 6px var(--gold)) drop-shadow(0 0 3px var(--gold)); animation: pulse 0.9s infinite alternate; }
+.spot { animation: spot 0.9s infinite alternate; }
+@keyframes spot { from { filter: drop-shadow(0 0 3px var(--gold)); } to { filter: drop-shadow(0 0 10px var(--gold)) drop-shadow(0 0 4px var(--gold)); } }
 #ask { display: flex; gap: 6px; }
 #ask textarea { flex: 1; font: inherit; font-size: 16px; border-radius: 10px; padding: 6px; resize: none; }
 #ask button { width: 48px; font-size: 22px; }
@@ -94,3 +95,22 @@ body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
 #status { display: flex; justify-content: flex-end; min-height: 0; }
 #status button { width: 48px; height: 48px; font-size: 22px; }
 #offline { font-size: 26px; color: #e5484d; }
+/* Tutorial (🎓): fixed table on the left/top, the step demo beside it. */
+#tutorial { -webkit-tap-highlight-color: transparent; position: fixed; inset: 0; z-index: 70; background: var(--dark); display: flex; align-items: center; justify-content: center; gap: 2vmin; cursor: pointer; }
+#tutorial .tut-table { width: min(100vw, 92dvh); height: min(100vw, 92dvh); flex: none; }
+#tutorial .tut-table svg { width: 100%; height: 100%; display: block; }
+#tutorial .tut-demo { min-width: 0; }
+#tutorial .demo { align-items: center; }
+#tutorial .demo-strip { height: min(20vmin, 150px); width: auto; max-width: 46vw; }
+#tutorial .gloss { font-size: 34px; }
+#tutorial .gloss-r { font-size: 22px; }
+#tutorial .tut-dots { position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; }
+#tutorial .tut-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ivory); opacity: 0.3; }
+#tutorial .tut-dots i.past { opacity: 0.6; }
+#tutorial .tut-dots i.on { background: var(--gold); opacity: 1; }
+#tut-close { position: fixed; top: 8px; right: 8px; width: 48px; height: 48px; font-size: 22px; }
+@media (orientation: portrait) {
+  #tutorial { flex-direction: column; justify-content: flex-start; padding-top: 64px; }
+  #tutorial .tut-table { width: 100vw; height: 100vw; }
+  #tutorial .demo-strip { max-width: 96vw; height: min(18vh, 140px); }
+}

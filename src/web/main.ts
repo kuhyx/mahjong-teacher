@@ -3,14 +3,15 @@ import { soundIcon } from './icons.ts'
 import { Audio } from './audio.ts'
 import { Game } from './game.ts'
 import { mountMarking } from './mark/mount.ts'
+import { mountTutorial } from './tutorial.ts'
 import { setIndexLabels } from './render/tile.ts'
 import { handStripSvg, tableSvg } from './render/table.ts'
 import { actOptions } from '../engine/round.ts'
 import { actionBar, endScreen, roundResult } from './ui.ts'
 import './style.css'
 
-// Boot: `?agent=1` = muted autodrive bot (agent and E2E runs); `?seed=N` and
-// `?len=east` (short test game) are the only other params. No menu.
+// Boot: `?agent=1` = muted autodrive bot (agent and E2E runs); `?seed=N`,
+// `?len=east` (short test game) and `?tutorial=1` (open 🎓 at once). No menu.
 
 const params = new URLSearchParams(location.search)
 const agent = params.get('agent') === '1'
@@ -23,6 +24,7 @@ app.innerHTML = `<main id="stage"><div id="table-wrap"></div><div id="actions"><
   <button id="t-mark" aria-label="Freeze and mark" data-entity="button:mark" data-label="freeze-frame marking button">✎</button>
   <button id="t-sound" aria-label="Sound on or off" data-entity="button:sound" data-label="sound toggle">${soundIcon(audio.on)}</button>
   <button id="t-index" aria-label="Corner index labels on or off" data-entity="button:index" data-label="tile index label toggle">5p</button>
+  <button id="t-tutorial" aria-label="Tutorial" data-entity="button:tutorial" data-label="tutorial button">🎓</button>
 </nav>`
 
 let game: Game | null = null
@@ -61,7 +63,7 @@ function startGame(length: MatchLength, seed: number): void {
 
 document.addEventListener('click', (ev) => {
   const t = ev.target as Element
-  if (!game || document.body.classList.contains('marking')) return
+  if (!game || document.body.classList.contains('marking') || document.body.classList.contains('tutorial')) return
   const act = t.closest<HTMLElement>('[data-act]')?.dataset['act']
   if (act) return onAct(game, act)
   const kind = t.closest<SVGGElement>('g.playable')?.dataset['kind']
@@ -97,10 +99,14 @@ $('t-index').addEventListener('click', () => {
   render()
 })
 
+const tutorial = mountTutorial({ pause: (on) => game?.setPaused(on) })
+$('t-tutorial').addEventListener('click', () => tutorial.open())
+
 // No menu: the page opens straight into a full hanchan. `?len=east` is the
 // short test mode; `?seed=N` fixes the deal, otherwise it is random.
 const len = params.get('len') === 'east' ? 'east' : 'hanchan'
 startGame(len, Number(params.get('seed') ?? String(Date.now() % 100000)))
+if (params.get('tutorial') === '1') tutorial.open()
 
 declare global {
   interface Window { __mj: { game: () => Game | null; audioOn: () => boolean } }
