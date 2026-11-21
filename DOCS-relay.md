@@ -25,3 +25,9 @@
   `Restart=always` + linger bring it back after a reboot.
 - Model calls: `claude -p --safe-mode --tools Read` with every API-key variable
   stripped, so usage comes from the plan login of the CLI.
+
+## Firebase Auth domain
+
+Google sign-in from the public site needs `mahjong.kuhy.duckdns.org` in the
+`kuhy-syncs` project's Auth authorized domains (added 2026-11-21 through the
+Identity Toolkit admin API, `updateMask=authorizedDomains`).
