@@ -12,6 +12,7 @@
 | F8 | Public site at phone size, signed in as kuhy, real question through RTDB -> mahjong-relay -> `claude -p` | `node scripts/e2e_relay_live.ts` (spends plan usage) |
 | F9 | Android shell `com.kuhy.mahjong` (`app/`): loads the site, one-tap native Google sign-in, answer arrives; off-origin pages get no token | `cd app && flutter test` (bridge logic); device: `phone_deploy.sh <checkout>/app --release --stage ...` then drive it on `phone_vd.sh` |
 | F10 | Opening the page starts a full hanchan at once (no menu); `?len=east` is the short test mode | `node scripts/e2e_start.ts` |
+| F11 | 🎓 tutorial: every scene over a fixed table, one step per tap, gloss chip on first use, no other text, taps never play a move; every marked item in the logs has a scene; docs pictures | `node scripts/e2e_tutorial.ts` and `--touch`; `pnpm tutorial-coverage`; `node scripts/e2e_tutorial.ts --touch --shots docs/tutorial && pnpm tutorial-doc` |
 | F12 | Instant proposal: mark something, tap ➤ with nothing typed; Claude answers at once with a meaning, a demo (tile strip, table spotlight, kanji+romaji chip) and a next step; ✗ asks for another way; ✓ keeps the accepted demo in the log; a wrong score is struck by the engine | `node scripts/e2e_propose.ts` and `--touch` (412x915); relay path: `node scripts/relay_smoke.ts` |
 
 Unit/property tests (`pnpm test`): scoring table (S1-S8), round flow, headless
