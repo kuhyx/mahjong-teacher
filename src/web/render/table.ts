@@ -25,13 +25,13 @@ const text = (x: number, y: number, s: string, size: number, fill: string, extra
   `<text x="${String(x)}" y="${String(y)}" font-size="${String(size)}" fill="${fill}" text-anchor="middle" font-family="'Noto Serif CJK JP','WenQuanYi Zen Hei',serif" ${extra}>${s}</text>`
 
 function pond(pl: PlayerState, seat: number, s: RoundState): string {
-  const sc = 0.6
+  const sc = 0.72
   const out: string[] = []
   pl.discards.forEach((d, i) => {
     const row = Math.min(3, Math.floor(i / 6))
     const col = row === 3 ? i - 18 : i % 6
-    const x = 389 + col * (TW * sc + 1)
-    const y = 640 + row * (TH * sc + 4)
+    const x = 367 + col * (TW * sc + 1)
+    const y = 628 + row * (TH * sc + 3)
     const last = s.lastDiscard?.seat === seat && i === pl.discards.length - 1
     out.push(tileSvg(d.tile, {
       x: d.riichi ? x + 6 : x, y, scale: sc, rotate: d.riichi ? 90 : 0,

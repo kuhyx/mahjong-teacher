@@ -3,14 +3,15 @@ import { actOptions } from '../engine/round.ts'
 import type { RoundResult } from '../engine/round_types.ts'
 import type { Game } from './game.ts'
 import { tileSvg } from './render/tile.ts'
+import { tileName } from '../engine/tiles.ts'
 import { SEAT_GLYPH, TERMS } from './strings.ts'
 
 // HTML chrome around the SVG table: action buttons, round result, end screen.
 // Buttons show the game's own terms (Pon, Riichi...) or a glyph; every one has
 // an aria-label and a data-entity so the marking tool can pick it.
 
-const mini = (k: number, scale = 0.5): string =>
-  `<svg class="mini" viewBox="0 0 ${String(62 * scale)} ${String(84 * scale)}">${tileSvg(k, { x: 1, y: 1, scale })}</svg>`
+const mini = (k: number, scale = 0.5, where = 'button'): string =>
+  `<svg class="mini" viewBox="0 0 ${String(62 * scale)} ${String(84 * scale)}">${tileSvg(k, { x: 1, y: 1, scale, entity: `tile:${where}:${String(k)}`, label: `${tileName(k)} (${where})` })}</svg>`
 
 function button(id: string, face: string, aria: string): string {
   return `<button class="act" data-act="${id}" data-entity="button:${id}" data-label="${aria} button" aria-label="${aria}">${face}</button>`
@@ -44,7 +45,7 @@ function resultBody(r: RoundResult): string {
     return `<div class="big">${TERMS.ryuukyoku}</div><div class="seats">${marks.join('')}</div>`
   }
   const sc = r.score
-  const hand = r.hand.map((k) => mini(k, 0.7)).join('')
+  const hand = r.hand.map((k) => mini(k, 0.7, 'winning hand')).join('')
   const yaku = (sc?.yaku ?? []).map((y) => `<li>${y.name}<span>${y.yakuman > 0 ? '★' : String(y.han)}</span></li>`)
   if (sc && sc.dora > 0) yaku.push(`<li>${TERMS.dora}<span>${String(sc.dora)}</span></li>`)
   if (sc && sc.ura > 0) yaku.push(`<li>${TERMS.ura}<span>${String(sc.ura)}</span></li>`)
@@ -72,7 +73,8 @@ export function endScreen(g: Game): string {
     const r = h.result
     if (r.type === 'draw') return `<li>${h.label}: ${TERMS.ryuukyoku}</li>`
     const yaku = (r.score?.yaku ?? []).map((y) => y.name.split(' (')[0]).join(', ')
-    return `<li>${h.label}: ${SEAT_GLYPH[r.winner] ?? ''} ${r.type === 'tsumo' ? TERMS.tsumo : TERMS.ron} — ${yaku} · ${String(r.score?.han ?? 0)} han ${String(r.score?.fu ?? 0)} fu</li>`
+    const hand = r.hand.map((k) => mini(k, 0.4, `winning hand of ${h.label}`)).join('')
+    return `<li data-entity="win:${h.label}" data-label="win in ${h.label}: ${yaku}, ${String(r.score?.han ?? 0)} han ${String(r.score?.fu ?? 0)} fu">${h.label}: ${SEAT_GLYPH[r.winner] ?? ''} ${r.type === 'tsumo' ? TERMS.tsumo : TERMS.ron} — ${yaku} · ${String(r.score?.han ?? 0)} han ${String(r.score?.fu ?? 0)} fu<div class="hand">${hand}</div></li>`
   })
   return `<div class="panel end" id="end-screen" data-entity="end" data-label="final results">` +
     `<div class="places">${rows.join('')}</div><ul class="history">${wins.join('')}</ul>${button('again', '↻', 'New game')}</div>`

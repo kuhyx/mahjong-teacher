@@ -32,3 +32,36 @@ svg.mini { height: 1.6em; }
 .panel ul.history { font-size: 15px; max-height: 40dvh; overflow: auto; }
 .menu { display: flex; gap: 24px; }
 button.mode { font-size: 64px; padding: 16px 32px; font-family: 'Noto Serif CJK JP', 'WenQuanYi Zen Hei', serif; }
+.panel ul.history .hand svg.mini { height: 30px; }
+.panel ul.history li { margin: 6px 0; }
+/* Marking mode */
+#mark-canvas { position: fixed; inset: 0; width: 100vw; height: 100dvh; z-index: 40; cursor: crosshair; touch-action: none; }
+#mark-tools { position: fixed; left: 8px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px; z-index: 50; }
+#mark-tools button { width: 46px; height: 46px; font-size: 22px; }
+#mark-tools button.on { background: var(--gold); }
+#mark-text { position: fixed; z-index: 60; font-size: 18px; padding: 4px; border: 2px solid var(--red); }
+body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
+#chat { position: fixed; right: 0; top: 0; bottom: 0; width: min(420px, 38vw); z-index: 50; background: rgba(22, 58, 44, 0.97); border-left: 2px solid var(--gold); display: flex; flex-direction: column; padding: 10px; gap: 8px; }
+#chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--gold); color: var(--ink); border-radius: 10px; padding: 2px 8px; font-size: 13px; }
+#thread { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+.turn { padding: 8px 10px; border-radius: 12px; line-height: 1.4; font-size: 15px; }
+.turn p { margin: 0 0 6px; }
+.turn.user { align-self: flex-end; background: var(--ivory); color: var(--ink); max-width: 85%; }
+.turn.assistant { background: #24604a; }
+.turn.flagged { border: 2px solid var(--red); }
+.turn .fix { margin-top: 6px; color: #ffd27a; }
+.turn.waiting { animation: pulse 1s infinite alternate; }
+@keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+#ask { display: flex; gap: 6px; }
+#ask textarea { flex: 1; font: inherit; font-size: 16px; border-radius: 10px; padding: 6px; resize: none; }
+#ask button { width: 48px; font-size: 22px; }
+#chat.shake { animation: shake 0.4s; border-color: var(--red); }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@media (orientation: portrait) {
+  #chat { top: auto; left: 0; width: 100vw; height: 44dvh; border-left: 0; border-top: 2px solid var(--gold); }
+  #mark-tools { top: 8px; transform: none; flex-direction: row; flex-wrap: wrap; left: 8px; right: 64px; }
+}
+@media (orientation: landscape) {
+  body.marking #stage { width: calc(100vw - min(420px, 38vw)); }
+}

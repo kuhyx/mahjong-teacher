@@ -25,6 +25,7 @@ app.innerHTML = `<main id="stage"><div id="table-wrap"></div><div id="actions"><
 </nav>`
 
 let game: Game | null = null
+const hooks = mountMarking({ getGame: () => game, rerender: () => render() })
 const $ = (id: string): HTMLElement => {
   const el = document.getElementById(id)
   if (!el) throw new Error(`no #${id}`)
@@ -41,12 +42,14 @@ function render(): void {
   const overlay = $('overlay')
   overlay.innerHTML = g.screen === 'round_end' ? roundResult(g) : g.screen === 'end' ? endScreen(g) : ''
   document.body.dataset['screen'] = g.screen
+  hooks.onRender(g)
 }
 
 function startGame(length: MatchLength, seed: number): void {
   const delay = Number(params.get('delay') ?? (agent ? '0' : '450'))
   game = new Game({ seed, length, delay, autodrive: agent || params.get('autodrive') === '1' })
   game.onChange = render
+  hooks.onGame(game)
   game.onDiscard = () => audio.clack()
   render()
   game.start()
@@ -102,7 +105,6 @@ $('t-index').addEventListener('click', () => {
   render()
 })
 
-mountMarking({ getGame: () => game, rerender: render })
 const len = params.get('len')
 if (len === 'east' || len === 'hanchan') startGame(len, Number(params.get('seed') ?? '1'))
 else menu()
