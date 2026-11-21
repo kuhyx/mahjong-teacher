@@ -1,5 +1,6 @@
 import type { PlayLog } from '../../log/log.ts'
 import { serializeLog } from '../../log/log.ts'
+import { nativeSignIn, type ShellWindow } from './native_signin.ts'
 import type { AskReply, AskRequest, Transport } from './transport.ts'
 
 // Public-site transport: the page (phone or PC browser) signs in with Google
@@ -35,7 +36,11 @@ function auth(): Promise<{ mod: AuthMod; auth: ReturnType<AuthMod['getAuth']> }>
 
 export async function signIn(): Promise<void> {
   const { mod, auth: a } = await auth()
-  await mod.signInWithPopup(a, new mod.GoogleAuthProvider())
+  await nativeSignIn<ReturnType<AuthMod['GoogleAuthProvider']['credential']>>(globalThis as unknown as ShellWindow, {
+    popup: () => mod.signInWithPopup(a, new mod.GoogleAuthProvider()),
+    withCred: (c) => mod.signInWithCredential(a, c),
+    credential: (t) => mod.GoogleAuthProvider.credential(t),
+  })
 }
 
 export async function signedIn(): Promise<boolean> {

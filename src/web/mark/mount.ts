@@ -74,7 +74,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
       if (!(await signedIn())) return cp.status('signin', () => void signIn().then(() => relayStatus(cp)).catch(() => cp.error()))
       cp.status((await workerAge()) > 90 ? 'offline' : null)
     } catch (e) {
-      cp.status(e instanceof SignInNeeded ? 'signin' : 'offline', () => void signIn().then(() => relayStatus(cp)))
+      cp.status(e instanceof SignInNeeded ? 'signin' : 'offline', () => void signIn().then(() => relayStatus(cp)).catch(() => cp.error()))
     }
   }
 
@@ -117,7 +117,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
       pending = null
       panel.thread(s.item, null)
       panel.error()
-      if (e instanceof SignInNeeded) panel.status('signin', () => void signIn().then(() => panel && relayStatus(panel)))
+      if (e instanceof SignInNeeded) panel.status('signin', () => void signIn().then(() => panel && relayStatus(panel)).catch(() => panel?.error()))
       console.error(e)
     }
   }
