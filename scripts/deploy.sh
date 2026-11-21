@@ -1,10 +1,17 @@
 #!/bin/bash
 # Install, build, (re)start and health-check Mahjong Teacher on this PC.
-# Idempotent. Runs from the checkout it lives in (normally ~/src/mahjong-teacher).
+# Idempotent. Runs only from ~/src/mahjong-teacher: the units point at the
+# checkout deploy runs from, so a throwaway worktree would leave them on a path
+# that later vanishes. MJ_ANY_CHECKOUT=1 allows another checkout on purpose.
 # Exits non-zero unless scripts/health.ts passes.
 set -euo pipefail
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+REPO="$(cd "$(dirname "$0")/.." && pwd -P)"
 readonly REPO
+readonly CANONICAL="$HOME/src/mahjong-teacher"
+if [[ "${MJ_ANY_CHECKOUT:-0}" != "1" && "$REPO" != "$(realpath -m "$CANONICAL")" ]]; then
+    echo "deploy runs from $CANONICAL, not $REPO (MJ_ANY_CHECKOUT=1 to override)" >&2
+    exit 1
+fi
 readonly UNITS=(mahjong-bridge.service mahjong-relay.service)
 readonly UNIT_DIR="$HOME/.config/systemd/user"
 cd "$REPO"
@@ -18,7 +25,7 @@ bash scripts/build.sh >/dev/null
 log "units"
 mkdir -p "$UNIT_DIR"
 for u in "${UNITS[@]}"; do
-    # Units use %h/src/mahjong-teacher; a checkout elsewhere gets its own path.
+    # Units use %h/src/mahjong-teacher; an MJ_ANY_CHECKOUT checkout gets its own path.
     sed "s#%h/src/mahjong-teacher#$REPO#g" "systemd/$u" > "$UNIT_DIR/$u"
 done
 systemctl --user daemon-reload
@@ -56,7 +63,7 @@ else
 fi
 log "health"
 for _ in 1 2 3 4 5 6 7 8 9 10; do
-    curl -fsS -o /dev/null "http://127.0.0.1:${MJ_PORT:-8797}/api/health" && break
+    curl -fsS -o /dev/null "http://127.0.0.1:${MJ_PORT:-8797}/api/health" 2>/dev/null && break
     sleep 0.5
 done
 node scripts/health.ts

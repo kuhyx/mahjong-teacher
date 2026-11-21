@@ -22,7 +22,7 @@ export interface Harness {
 
 export async function harness(viewport = { width: 1280, height: 800 }, touch = false): Promise<Harness> {
   const cfg: BridgeConfig = {
-    port: 0, dataDir: mkdtempSync(join(tmpdir(), 'mj-e2e-')), distDir: join(ROOT, 'dist'),
+    port: 0, root: ROOT, dataDir: mkdtempSync(join(tmpdir(), 'mj-e2e-')), distDir: join(ROOT, 'dist'),
     claudeBin: join(ROOT, 'tests/stub/claude'), env: { STUB_CLAUDE_LOG: join(tmpdir(), 'mj-e2e-claude.jsonl') },
   }
   const server = await startBridge(cfg)

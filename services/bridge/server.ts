@@ -10,6 +10,8 @@ import { BadRequest, handleAsk, loadLog, saveLog, saveShot } from './handlers.ts
 
 export interface BridgeConfig {
   port: number
+  /** Checkout this bridge runs from; /api/health reports it so run.sh can tell a stale server apart. */
+  root: string
   dataDir: string
   distDir: string
   claudeBin: string
@@ -58,7 +60,11 @@ function hostOk(req: IncomingMessage, cfg: BridgeConfig): boolean {
 }
 
 async function handleApi(req: IncomingMessage, res: ServerResponse, cfg: BridgeConfig, path: string): Promise<void> {
-  if (path === '/api/health') return send(res, 200, JSON.stringify({ ok: true, claude: existsSync(cfg.claudeBin) }))
+  if (path === '/api/health') {
+    // ok means "serves the game": a process whose checkout was deleted still answers, but has no page.
+    const page = existsSync(join(cfg.distDir, 'index.html'))
+    return send(res, 200, JSON.stringify({ ok: page, claude: existsSync(cfg.claudeBin), page, root: cfg.root }))
+  }
   const isWrite = req.method === 'POST' || req.method === 'PUT'
   if (isWrite && !(req.headers['content-type'] ?? '').startsWith('application/json')) return send(res, 415, '{"error":"json only"}')
   try {
