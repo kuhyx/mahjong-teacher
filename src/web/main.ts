@@ -3,7 +3,7 @@ import { Audio } from './audio.ts'
 import { Game } from './game.ts'
 import { mountMarking } from './mark/mount.ts'
 import { setIndexLabels } from './render/tile.ts'
-import { tableSvg } from './render/table.ts'
+import { handStripSvg, tableSvg } from './render/table.ts'
 import { actOptions } from '../engine/round.ts'
 import { actionBar, endScreen, roundResult } from './ui.ts'
 import './style.css'
@@ -17,7 +17,7 @@ const app = document.querySelector<HTMLDivElement>('#app')
 if (!app) throw new Error('no #app')
 const audio = new Audio(!agent && localStorage.getItem('mj.sound') === 'on')
 
-app.innerHTML = `<main id="stage"><div id="table-wrap"></div><div id="actions"></div><div id="overlay"></div></main>
+app.innerHTML = `<main id="stage"><div id="table-wrap"></div><div id="actions"></div><div id="hand-wrap"></div><div id="overlay"></div></main>
 <nav id="tools">
   <button id="t-mark" aria-label="Freeze and mark" data-entity="button:mark" data-label="freeze-frame marking button">✎</button>
   <button id="t-sound" aria-label="Sound on or off" data-entity="button:sound" data-label="sound toggle">${audio.on ? '♪' : '♪̸'}</button>
@@ -37,7 +37,9 @@ function render(): void {
   const g = game
   const playable = g.prompt()?.kind === 'act' ? actOptions(g.round).discards : []
   const riichiChoices = g.riichiMode ? actOptions(g.round).riichi : null
-  $('table-wrap').innerHTML = tableSvg(g.match, { playable, riichiChoices })
+  const handOutside = window.matchMedia('(orientation: portrait)').matches
+  $('table-wrap').innerHTML = tableSvg(g.match, { playable, riichiChoices, handOutside })
+  $('hand-wrap').innerHTML = handOutside ? handStripSvg(g.match, { playable, riichiChoices }) : ''
   $('actions').innerHTML = actionBar(g)
   const overlay = $('overlay')
   overlay.innerHTML = g.screen === 'round_end' ? roundResult(g) : g.screen === 'end' ? endScreen(g) : ''
@@ -92,6 +94,7 @@ function onAct(g: Game, act: string): void {
   }
 }
 
+window.addEventListener('resize', () => render())
 $('t-sound').addEventListener('click', () => {
   audio.toggle()
   localStorage.setItem('mj.sound', audio.on ? 'on' : 'off')

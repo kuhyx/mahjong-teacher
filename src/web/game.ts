@@ -93,6 +93,7 @@ export class Game {
   /** One AI or bot decision. Returns false when it must stop for the human or a screen. */
   private tick(): boolean {
     if (this.screen === 'round_end') {
+      if (!this.opts.autodrive) return false
       this.advance()
       return (this.screen as Screen) === 'play'
     }
@@ -113,6 +114,11 @@ export class Game {
   private doAct(a: ActAction): void {
     applyAct(this.round, a)
     if (a.type === 'discard') this.onDiscard()
+  }
+
+  /** The easy AI's choice for seat 0 now (test driver; a future hint button). */
+  hint(): ActAction | null {
+    return this.prompt()?.kind === 'act' ? (this.ais[0]?.act(this.round) ?? null) : null
   }
 
   /** Human action from the UI; ignores anything not legal right now. */

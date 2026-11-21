@@ -19,6 +19,8 @@ export interface ViewHints {
   playable: number[]
   /** Hand kinds that keep tenpai for riichi (while choosing a riichi discard). */
   riichiChoices: number[] | null
+  /** Portrait phones: the hand is drawn in its own larger strip (handStripSvg). */
+  handOutside?: boolean
 }
 
 const text = (x: number, y: number, s: string, size: number, fill: string, extra = ''): string =>
@@ -58,22 +60,37 @@ function meldSvg(m: Meld, x: number, y: number, sc: number, seat: number, i: num
   }
 }
 
-function humanRow(pl: PlayerState, s: RoundState, hints: ViewHints): string {
-  const sc = 0.95
+function handTiles(pl: PlayerState, s: RoundState, hints: ViewHints, sc: number, place: (i: number, n: number, drawn: boolean) => [number, number]): string {
   const out: string[] = []
   const drawn = s.turn === 0 && s.phase === 'act' ? s.drawn : null
   const hand = [...pl.hand]
   if (drawn !== null) hand.splice(hand.indexOf(drawn), 1)
   const tiles = drawn === null ? hand : [...hand, drawn]
   tiles.forEach((k, i) => {
-    const gap = drawn !== null && i === tiles.length - 1 ? 14 : 0
+    const isDrawn = drawn !== null && i === tiles.length - 1
     const ok = hints.riichiChoices ? hints.riichiChoices.includes(k) : hints.playable.includes(k)
+    const [x, y] = place(i, tiles.length, isDrawn)
     out.push(tileSvg(k, {
-      x: 16 + i * (TW * sc + 2) + gap, y: 900, scale: sc,
-      entity: `hand:0:${String(i)}`, label: `${tileName(k)} in your hand${gap > 0 ? ' (just drawn)' : ''}`,
+      x, y, scale: sc,
+      entity: `hand:0:${String(i)}`, label: `${tileName(k)} in your hand${isDrawn ? ' (just drawn)' : ''}`,
       extraClass: `hand${ok ? ' playable' : ''}${hints.riichiChoices && ok ? ' riichi-ok' : ''}`,
     }).replace('<g ', `<g data-kind="${String(k)}" `))
   })
+  return out.join('')
+}
+
+/** Portrait hand: two rows of 7, big enough to tap. */
+export function handStripSvg(m: MatchState, hints: ViewHints): string {
+  const pl = m.round.players[0]
+  if (!pl) return ''
+  const body = handTiles(pl, m.round, hints, 1, (i, _n, drawn) => [4 + (i % 7) * 64 + (drawn ? 8 : 0), 6 + Math.floor(i / 7) * 90])
+  return `<svg xmlns="http://www.w3.org/2000/svg" id="hand" viewBox="0 0 462 184">${body}</svg>`
+}
+
+function humanRow(pl: PlayerState, s: RoundState, hints: ViewHints): string {
+  const sc = 0.95
+  const out: string[] = []
+  if (!hints.handOutside) out.push(handTiles(pl, s, hints, sc, (i, _n, drawn) => [16 + i * (TW * sc + 2) + (drawn ? 14 : 0), 900]))
   let mx = 984
   pl.melds.forEach((m, i) => {
     const r = meldSvg(m, 0, 0, 0.6, 0, i)

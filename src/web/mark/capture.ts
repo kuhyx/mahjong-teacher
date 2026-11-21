@@ -63,10 +63,9 @@ export async function captureStage(stage: HTMLElement): Promise<{ canvas: HTMLCa
   ctx.translate(-rect.left, -rect.top)
   ctx.fillStyle = getComputedStyle(document.body).backgroundColor
   ctx.fillRect(rect.left, rect.top, rect.width, rect.height)
-  const table = stage.querySelector<SVGSVGElement>('#table')
-  if (table) {
-    const r = table.getBoundingClientRect()
-    ctx.drawImage(await svgImage(table), r.left, r.top, r.width, r.height)
+  for (const svg of stage.querySelectorAll<SVGSVGElement>('#table, #hand')) {
+    const r = svg.getBoundingClientRect()
+    if (r.width > 0) ctx.drawImage(await svgImage(svg), r.left, r.top, r.width, r.height)
   }
   for (const btn of stage.querySelectorAll<HTMLElement>('#actions button')) {
     const r = btn.getBoundingClientRect()

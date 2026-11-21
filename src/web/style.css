@@ -65,3 +65,11 @@ body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
 @media (orientation: landscape) {
   body.marking #stage { width: calc(100vw - min(420px, 38vw)); }
 }
+#hand-wrap svg { width: 100%; display: block; }
+@media (orientation: portrait) {
+  #stage { flex-direction: column; justify-content: flex-start; padding-top: 64px; gap: 6px; }
+  #actions { position: static; transform: none; flex-wrap: wrap; justify-content: center; min-height: 48px; }
+  #hand-wrap { width: 100vw; }
+  #tools { flex-direction: row; }
+  body.marking #stage { height: 56dvh; overflow: hidden; }
+}
