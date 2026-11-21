@@ -1,0 +1,4 @@
+# Install scripts we do not need (firebase/protobuf postinstall).
+allowBuilds:
+  "@firebase/util": false
+  protobufjs: false
