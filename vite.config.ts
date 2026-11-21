@@ -10,6 +10,8 @@ export default defineConfig({
     globals: true,
     include: ['tests/**/*.test.ts'],
     environment: 'node',
-    coverage: { provider: 'v8', include: ['src/engine/**', 'src/ai/**', 'src/log/**', 'services/**'] },
+    // Headless whole-match sims take ~12 s each under v8 coverage on the capped CPU.
+    testTimeout: 30_000,
+    coverage: { provider: 'v8', include: ['src/engine/**', 'src/ai/**', 'src/log/**', 'src/tutorial/**', 'services/**/*.ts'] },
   },
 })
