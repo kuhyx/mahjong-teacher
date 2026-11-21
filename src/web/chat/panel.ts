@@ -25,7 +25,7 @@ export class ChatPanel {
   constructor(parent: HTMLElement, h: PanelHandlers) {
     this.el = document.createElement('aside')
     this.el.id = 'chat'
-    this.el.innerHTML = `<div id="chips"></div><div id="thread" aria-live="polite"></div>
+    this.el.innerHTML = `<div id="status"></div><div id="chips"></div><div id="thread" aria-live="polite"></div>
       <form id="ask"><textarea id="q" rows="2" aria-label="Your question (English or Polish)"></textarea>
       <button type="submit" id="send" aria-label="Send question">➤</button>
       <button type="button" id="clear" aria-label="${CLEAR_PHRASE}">✓</button></form>`
@@ -64,6 +64,16 @@ export class ChatPanel {
     if (pending !== null) turns.push(`<div class="turn user">${esc(pending)}</div><div class="turn assistant waiting" aria-label="waiting for the answer">…</div>`)
     box.innerHTML = turns.join('')
     box.scrollTop = box.scrollHeight
+  }
+
+  /** Glyph state: sign-in needed (tap to sign in), PC worker offline, or none. */
+  status(kind: 'signin' | 'offline' | null, onSignIn?: () => void): void {
+    const box = this.el.querySelector<HTMLElement>('#status')
+    if (!box) return
+    box.innerHTML = kind === 'signin'
+      ? '<button id="signin" aria-label="Sign in with Google to ask" data-entity="button:signin" data-label="sign-in needed">🔑</button>'
+      : kind === 'offline' ? '<span id="offline" role="img" aria-label="PC worker offline: the question waits in the queue">⏻</span>' : ''
+    box.querySelector('#signin')?.addEventListener('click', () => onSignIn?.())
   }
 
   error(): void {

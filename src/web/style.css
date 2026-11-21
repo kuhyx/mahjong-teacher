@@ -73,3 +73,6 @@ body.marking #stage { outline: 4px solid var(--gold); outline-offset: -4px; }
   #tools { flex-direction: row; }
   body.marking #stage { height: 56dvh; overflow: hidden; }
 }
+#status { display: flex; justify-content: flex-end; min-height: 0; }
+#status button { width: 48px; height: 48px; font-size: 22px; }
+#offline { font-size: 26px; color: #e5484d; }

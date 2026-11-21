@@ -1,7 +1,8 @@
 import { explain } from '../../engine/explain.ts'
 import { parseLog, serializeLog } from '../../log/log.ts'
 import { ChatPanel } from '../chat/panel.ts'
-import { pickTransport } from '../chat/pick.ts'
+import { pickTransport, usesRelay } from '../chat/pick.ts'
+import { SignInNeeded, signIn, signedIn, workerAge } from '../chat/relay.ts'
 import { PlaySession } from '../chat/session.ts'
 import type { Game } from '../game.ts'
 import { captureStage, toJpegBase64 } from './capture.ts'
@@ -63,6 +64,18 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     ml.onText = (x, y) => textInput(ml, x, y)
     s.setFrame({ entities: [], marks: [], pngBase64: '', jpegBase64: '', snapshot: explain(g.match) })
     cp.thread(null, null)
+    void relayStatus(cp)
+  }
+
+  /** Public site only: show the sign-in or worker-offline glyph. */
+  async function relayStatus(cp: ChatPanel): Promise<void> {
+    if (!usesRelay()) return
+    try {
+      if (!(await signedIn())) return cp.status('signin', () => void signIn().then(() => relayStatus(cp)).catch(() => cp.error()))
+      cp.status((await workerAge()) > 90 ? 'offline' : null)
+    } catch (e) {
+      cp.status(e instanceof SignInNeeded ? 'signin' : 'offline', () => void signIn().then(() => relayStatus(cp)))
+    }
   }
 
   function onTool(id: string): void {
@@ -104,6 +117,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
       pending = null
       panel.thread(s.item, null)
       panel.error()
+      if (e instanceof SignInNeeded) panel.status('signin', () => void signIn().then(() => panel && relayStatus(panel)))
       console.error(e)
     }
   }
