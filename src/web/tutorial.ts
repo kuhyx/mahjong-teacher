@@ -50,7 +50,7 @@ export function mountTutorial(host: TutorialHost): { open: () => void } {
     el.setAttribute('role', 'dialog')
     el.setAttribute('aria-label', 'Tutorial: tap for the next step')
     el.innerHTML = `<div class="tut-table">${table}</div><div class="tut-demo"></div><div class="tut-dots" aria-hidden="true"></div>` +
-      '<button id="tut-close" aria-label="Close the tutorial">✕</button>'
+      '<button id="tut-close" aria-label="Close the tutorial" title="Close">✕</button>'
     el.addEventListener('click', (e) => {
       e.stopPropagation()
       if ((e.target as Element).closest('#tut-close')) close()

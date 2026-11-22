@@ -35,9 +35,9 @@ export class ChatPanel {
     this.el.id = 'chat'
     this.el.innerHTML = `<div id="status"></div><div id="chips"></div><div id="thread" aria-live="polite"></div>
       <form id="ask"><textarea id="q" rows="2" aria-label="Your question (English or Polish)"></textarea>
-      <button type="submit" id="send" aria-label="Send question, or show me a proposal when empty">➤</button>
-      <button type="button" id="reject" aria-label="Show it another way" hidden>✗</button>
-      <button type="button" id="clear" aria-label="${CLEAR_PHRASE}">✓</button></form>`
+      <button type="submit" id="send" aria-label="Send question, or show me a proposal when empty" title="Send">➤</button>
+      <button type="button" id="reject" aria-label="Show it another way" title="Another" hidden>✗</button>
+      <button type="button" id="clear" aria-label="${CLEAR_PHRASE}" title="Understood">✓</button></form>`
     parent.appendChild(this.el)
     const input = this.el.querySelector<HTMLTextAreaElement>('#q')
     if (!input) throw new Error('no input')
@@ -101,7 +101,7 @@ export class ChatPanel {
     const box = this.el.querySelector<HTMLElement>('#status')
     if (!box) return
     box.innerHTML = kind === 'signin'
-      ? '<button id="signin" aria-label="Sign in with Google to ask" data-entity="button:signin" data-label="sign-in needed">🔑</button>'
+      ? '<button id="signin" aria-label="Sign in with Google to ask" title="Sign-in" data-entity="button:signin" data-label="sign-in needed">🔑</button>'
       : kind === 'offline' ? `<span id="offline" role="img" aria-label="PC worker offline: the question waits in the queue">${offlineIcon()}</span>` : ''
     box.querySelector('#signin')?.addEventListener('click', () => onSignIn?.())
   }

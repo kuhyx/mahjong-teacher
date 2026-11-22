@@ -18,9 +18,9 @@ export interface MarkHost {
   rerender: () => void
 }
 
-const TOOLS: [Tool | 'undo' | 'wipe' | 'exit', string, string][] = [
-  ['pick', '☝', 'Pick a tile or item'], ['rect', '▭', 'Rectangle'], ['arrow', '➚', 'Arrow'], ['circle', '◯', 'Circle'],
-  ['pen', '✎', 'Pen'], ['text', 'T', 'Text note'], ['undo', '↶', 'Undo'], ['wipe', '⌫', 'Clear marks'], ['exit', '✕', 'Close and resume'],
+const TOOLS: [Tool | 'undo' | 'wipe' | 'exit', string, string, string][] = [
+  ['pick', '☝', 'Pick a tile or item', 'Pick'], ['rect', '▭', 'Rectangle', 'Rectangle'], ['arrow', '➚', 'Arrow', 'Arrow'], ['circle', '◯', 'Circle', 'Circle'],
+  ['pen', '✎', 'Pen', 'Pen'], ['text', 'T', 'Text note', 'Note'], ['undo', '↶', 'Undo', 'Undo'], ['wipe', '⌫', 'Clear marks', 'Erase'], ['exit', '✕', 'Close and resume', 'Close'],
 ]
 
 export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRender: (g: Game) => void } {
@@ -56,7 +56,7 @@ export function mountMarking(host: MarkHost): { onGame: (g: Game) => void; onRen
     layer = ml
     bar = document.createElement('nav')
     bar.id = 'mark-tools'
-    bar.innerHTML = TOOLS.map(([id, glyph, aria]) => `<button data-tool="${id}" aria-label="${aria}"${id === 'pick' ? ' class="on"' : ''}>${glyph}</button>`).join('')
+    bar.innerHTML = TOOLS.map(([id, glyph, aria, tip]) => `<button data-tool="${id}" aria-label="${aria}" title="${tip}"${id === 'pick' ? ' class="on"' : ''}>${glyph}</button>`).join('')
     document.body.appendChild(bar)
     bar.addEventListener('click', (e) => onTool((e.target as Element).closest<HTMLElement>('[data-tool]')?.dataset['tool'] ?? ''))
     const cp = new ChatPanel(document.body, { send: (q) => void send(q), propose: () => void send(null), reject: () => void send('reject') })

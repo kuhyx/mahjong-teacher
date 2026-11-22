@@ -21,10 +21,10 @@ const audio = new Audio(!agent && localStorage.getItem('mj.sound') === 'on')
 
 app.innerHTML = `<main id="stage"><div id="table-wrap"></div><div id="actions"></div><div id="hand-wrap"></div><div id="overlay"></div></main>
 <nav id="tools">
-  <button id="t-mark" aria-label="Freeze and mark" data-entity="button:mark" data-label="freeze-frame marking button">✎</button>
-  <button id="t-sound" aria-label="Sound on or off" data-entity="button:sound" data-label="sound toggle">${soundIcon(audio.on)}</button>
-  <button id="t-index" aria-label="Corner index labels on or off" data-entity="button:index" data-label="tile index label toggle">5p</button>
-  <button id="t-tutorial" aria-label="Tutorial" data-entity="button:tutorial" data-label="tutorial button">🎓</button>
+  <button id="t-mark" aria-label="Freeze and mark" title="Mark" data-entity="button:mark" data-label="freeze-frame marking button">✎</button>
+  <button id="t-sound" aria-label="Sound on or off" title="Sound" data-entity="button:sound" data-label="sound toggle">${soundIcon(audio.on)}</button>
+  <button id="t-index" aria-label="Corner index labels on or off" title="Index" data-entity="button:index" data-label="tile index label toggle">5p</button>
+  <button id="t-tutorial" aria-label="Tutorial" title="Tutorial" data-entity="button:tutorial" data-label="tutorial button">🎓</button>
 </nav>`
 
 let game: Game | null = null
