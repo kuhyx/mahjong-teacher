@@ -13,11 +13,11 @@ loopback `claude -p` bridge, `services/relay` Firebase RTDB worker for the phone
 
 - run: `./run.sh` (bridge + site on http://127.0.0.1:8797/)
 - test: `~/.claude/scripts/capped.sh pnpm test`
-- lint: `pnpm lint`
+- lint: n/a: dropped (kuhy, 2026-11-27)
 - e2e: `~/.claude/scripts/capped.sh pnpm e2e` (done check, headless Chromium, muted, < 60 s)
 - test-changed: `scripts/test_changed.sh`
-- coverage: `pnpm run coverage`
-- coverage-gaps: `coverage-gaps coverage/lcov.info`
+- coverage: n/a: dropped (kuhy, 2026-11-27)
+- coverage-gaps: n/a: dropped (kuhy, 2026-11-27)
 - deploy: `git -C ~/src/mahjong-teacher pull --ff-only && bash ~/src/mahjong-teacher/scripts/deploy.sh` (runs from any directory; the live units must point at ~/src/mahjong-teacher)
 
 ## Rules

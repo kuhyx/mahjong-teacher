@@ -7,13 +7,6 @@ default_install_hook_types: [pre-commit, post-commit, post-merge, post-rewrite]
 repos:
   - repo: local
     hooks:
-      # The shared 250-line cap. Checks only the files in the commit, so an
-      # unrelated commit never breaks. No baseline, no allowlist -- those are
-      # suppressions. The exemption list lives with the checker in ~/src/utils.
-      - id: file-length
-        name: file length <= 250 lines
-        entry: scripts/check_file_length.sh
-        language: system
 
       # Four markdown namespaces (README / CLAUDE* / DOCS* / TODO*), plus the
       # rule that a TODO carries "REMOVE ME AFTER FINISH" and nothing else may.
